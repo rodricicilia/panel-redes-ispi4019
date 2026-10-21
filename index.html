@@ -3,740 +3,657 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Redes — ISPI 4019</title>
+  <title>ISPI 4019 - Plataforma de Evaluación Avanzada de Redes</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- EmailJS SDK para envío seguro directo al correo del profesor -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             ispi: {
-              blue: '#2f6fc4',
-              green: '#7ac143',
-              orange: '#e8672a',
-              navy: '#2f2a73'
+              400: '#38bdf8',
+              500: '#0284c7',
+              600: '#0369a1',
             }
           }
         }
       }
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .font-mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    }
-    .glass-card {
-      background: rgba(30, 41, 59, 0.5);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .glass-card:hover {
-      border-color: rgba(47, 111, 196, 0.5);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 30px rgba(47, 111, 196, 0.2);
-    }
-    .glow-ispi {
-      box-shadow: 0 0 20px rgba(47, 111, 196, 0.35);
-    }
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.8);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(51, 65, 85, 0.8);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(100, 116, 139, 0.8);
+    .bg-grid {
+      background-size: 30px 30px;
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     }
   </style>
 </head>
-<body class="h-full flex flex-col justify-between overflow-x-hidden relative bg-slate-950 text-slate-100 selection:bg-[#2f6fc4] selection:text-white">
+<body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 bg-grid select-none overflow-x-hidden">
 
-  <!-- BACKGROUND ANIMATED CANVAS -->
-  <canvas id="bg-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-0 transition-opacity duration-1000 opacity-100"></canvas>
+  <!-- CANVAS 3D INTERACTIVO -->
+  <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
 
-  <!-- BACKGROUND RADIAL OVERLAY -->
-  <div id="bg-glow" class="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_50%_50%,rgba(47,111,196,0.12),rgba(15,23,42,0.95))] transition-opacity duration-1000 opacity-100"></div>
+  <!-- PANTALLA DE BLOQUEO INICIAL (STRICT KIOSK / MODO PANTALLA COMPLETA) -->
+  <div id="kioskModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+    <div class="max-w-xl w-full bg-slate-900 border-2 border-red-500/50 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-red-950/50 text-center relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-red-500/10 rounded-full blur-2xl"></div>
+      
+      <div class="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/40">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      </div>
 
-  <!-- HEADER -->
-  <header class="relative z-10 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md px-4 lg:px-8 py-4">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-4">
-        <!-- LOGO INTEGRADO -->
-        <img src="logo-ispi.png" alt="ISPI 4019 Logo" class="h-24 w-24 object-contain bg-white/90 p-0.1 rounded-md border border-slate-600 shadow-sm" onerror="this.onerror=null; this.src='img/logo-ispi.png'">
+      <h2 class="text-2xl font-bold text-white mb-2">EVALUACIÓN ACADÉMICA - ISPI 4019</h2>
+      <p class="text-red-400 text-sm font-semibold tracking-wider uppercase mb-4">Aviso Estricto de Seguridad e Integridad</p>
+
+      <div class="text-slate-300 text-sm text-left bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2 mb-6">
+        <p>• Esta evaluación debe rendirse en **Modo Pantalla Completa Obligatorio**.</p>
+        <p>• Queda estrictamente prohibido cambiar de pestaña, minimizar el navegador o utilizar herramientas externas.</p>
+        <p>• Cualquier intento de salida será registrado automáticamente como una **incidencia disciplinaria** en el informe final.</p>
+        <p>• Las respuestas confirmadas **no se podrán modificar** posteriormente.</p>
+      </div>
+
+      <button id="btnStartExam" onclick="startExamInKiosk()" class="w-full py-4 px-6 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-900/40 transition transform active:scale-95 flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        Entendido: Activar Pantalla Completa e Iniciar
+      </button>
+    </div>
+  </div>
+
+  <!-- CABECERA PRINCIPAL / LOGO -->
+  <header class="relative z-10 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <!-- LOGO ISPI AMAPLIADO Y DESTACADO -->
+        <div class="relative bg-white/95 p-1 rounded-lg border border-slate-600 shadow-md flex items-center justify-center">
+          <img src="logo-ispi.png" alt="ISPI 4019 Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='img/logo-ispi.png'">
+        </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#7ac143] animate-pulse"></span>
-            <h1 class="text-lg md:text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#2f6fc4] via-[#7ac143] to-[#e8672a]">
-              Panel de Redes — Infraestructura
-            </h1>
-          </div>
-          <p class="text-xs text-slate-400 font-mono tracking-wide">
-            ISPI 4019 San Juan Bautista · Tecnicatura en Soporte TI
-          </p>
+          <h1 class="text-lg font-bold text-white tracking-wide">ISPI 4019</h1>
+          <p class="text-xs text-sky-400 font-medium">Infraestructura de Redes & Seguridad</p>
         </div>
       </div>
-      <div class="hidden sm:flex items-center space-x-3 text-xs font-mono text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
-        <span class="text-[#7ac143]">● EN LINEA</span>
-        <span>|</span>
-        <span>MÓDULO EVALUACIÓN</span>
+
+      <!-- METRICAS DE TIEMPO Y CRÉDITOS -->
+      <div class="flex items-center gap-4 text-xs font-mono">
+        <div class="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
+          <span class="text-slate-400">TIEMPO:</span>
+          <span id="timerDisplay" class="text-sky-400 font-bold text-sm">00:00</span>
+        </div>
+        <div class="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
+          <span class="text-slate-400">PISTAS:</span>
+          <span id="hintsLeftDisplay" class="text-amber-400 font-bold text-sm">3 DISPONIBLES</span>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="relative z-10 flex-1 flex flex-col justify-center items-center px-4 py-8 max-w-7xl mx-auto w-full">
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-    <!-- SLIDE 1: DISPOSITIVOS DE RED -->
-    <section id="slide-devs" class="w-full space-y-6 transition-all duration-500 block">
-      <div class="text-center space-y-2 mb-8">
-        <span class="text-xs font-mono text-[#2f6fc4] tracking-wider uppercase px-3 py-1 bg-[#2f6fc4]/10 border border-[#2f6fc4]/30 rounded-full">
-          Componentes Físicos
-        </span>
-        <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-          Dispositivos de Infraestructura de Red
-        </h2>
-        <p class="text-sm text-slate-400 max-w-2xl mx-auto">
-          Examine los equipamientos clave de la capa de acceso, distribución y enlace de datos previo a la evaluación técnica.
-        </p>
-      </div>
-
-      <!-- Grid for 4 Cards in ONE row on Desktop -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full">
-        
-        <!-- CARD 1: ROUTER -->
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4 border-t-2 border-t-[#2f6fc4]">
-          <div class="space-y-3">
-            <div class="h-36 w-full rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center justify-center p-3 overflow-hidden group">
-              <img src="img/router.png" alt="Router" class="h-full w-auto object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.outerHTML='<svg class=\'w-16 h-16 text-[#2f6fc4]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z\'/></svg>'">
-            </div>
-            <div>
-              <span class="text-[10px] font-mono text-[#2f6fc4] uppercase tracking-widest font-bold">Capa 3 · Red</span>
-              <h3 class="text-lg font-bold text-white">Router (Enrutador)</h3>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Interconecta redes heterogéneas, determina la mejor ruta de forwarding mediante tablas de ruteo e implementa políticas IP y NAT.
-            </p>
-          </div>
-          <div class="pt-3 border-t border-slate-800 text-[11px] font-mono text-slate-400 flex justify-between">
-            <span>Protocolo: IP/BGP/OSPF</span>
-            <span class="text-[#2f6fc4] font-bold">L3</span>
-          </div>
-        </div>
-
-        <!-- CARD 2: SWITCH -->
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4 border-t-2 border-t-[#7ac143]">
-          <div class="space-y-3">
-            <div class="h-36 w-full rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center justify-center p-3 overflow-hidden group">
-              <img src="img/switch.png" alt="Switch" class="h-full w-auto object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.outerHTML='<svg class=\'w-16 h-16 text-[#7ac143]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\'/></svg>'">
-            </div>
-            <div>
-              <span class="text-[10px] font-mono text-[#7ac143] uppercase tracking-widest font-bold">Capa 2 · Enlace</span>
-              <h3 class="text-lg font-bold text-white">Switch (Conmutador)</h3>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Conecta dispositivos dentro de una LAN, conmutando tramas Ethernet basándose en direcciones MAC únicas para evitar colisiones.
-            </p>
-          </div>
-          <div class="pt-3 border-t border-slate-800 text-[11px] font-mono text-slate-400 flex justify-between">
-            <span>Tabla: MAC / CAM</span>
-            <span class="text-[#7ac143] font-bold">L2</span>
-          </div>
-        </div>
-
-        <!-- CARD 3: NIC / PLACA DE RED -->
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4 border-t-2 border-t-[#e8672a]">
-          <div class="space-y-3">
-            <div class="h-36 w-full rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center justify-center p-3 overflow-hidden group">
-              <img src="img/placa.png" alt="Placa de Red" class="h-full w-auto object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.outerHTML='<svg class=\'w-16 h-16 text-[#e8672a]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2\'/></svg>'">
-            </div>
-            <div>
-              <span class="text-[10px] font-mono text-[#e8672a] uppercase tracking-widest font-bold">Interfaz / Adaptador</span>
-              <h3 class="text-lg font-bold text-white">NIC (Placa de Red)</h3>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Interfaz física que convierte datos del host en señales eléctricas, ópticas o radiofrecuencia. Posee la MAC permanente.
-            </p>
-          </div>
-          <div class="pt-3 border-t border-slate-800 text-[11px] font-mono text-slate-400 flex justify-between">
-            <span>Interfaz: PCIe/RJ45/Wi-Fi</span>
-            <span class="text-[#e8672a] font-bold">L1/L2</span>
-          </div>
-        </div>
-
-        <!-- CARD 4: REPETIDOR -->
-        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4 border-t-2 border-t-[#2f2a73]">
-          <div class="space-y-3">
-            <div class="h-36 w-full rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-center justify-center p-3 overflow-hidden group">
-              <img src="img/repetidor.png" alt="Repetidor" class="h-full w-auto object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.outerHTML='<svg class=\'w-16 h-16 text-[#38bdf8]\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M13 10V3L4 14h7v7l9-11h-7z\'/></svg>'">
-            </div>
-            <div>
-              <span class="text-[10px] font-mono text-[#38bdf8] uppercase tracking-widest font-bold">Capa 1 · Física</span>
-              <h3 class="text-lg font-bold text-white">Repetidor / Extensor</h3>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Regenera y amplifica señales atenuadas para extender la cobertura física del medio sin examinar la trama ni el paquete.
-            </p>
-          </div>
-          <div class="pt-3 border-t border-slate-800 text-[11px] font-mono text-slate-400 flex justify-between">
-            <span>Función: Regeneración Señal</span>
-            <span class="text-[#38bdf8] font-bold">L1</span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- NEXT BUTTON -->
-      <div class="flex justify-end pt-4">
-        <button id="btn-to-ready" class="px-6 py-3 rounded-xl bg-gradient-to-r from-[#2f6fc4] to-[#2f2a73] hover:from-[#3a80df] hover:to-[#383387] text-white font-bold text-sm tracking-wide shadow-lg shadow-[#2f6fc4]/20 transition-all flex items-center space-x-2 group cursor-pointer border border-[#2f6fc4]/40">
-          <span>Siguiente</span>
-          <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-          </svg>
-        </button>
-      </div>
-    </section>
-
-    <!-- SLIDE 2: READY / WELCOME -->
-    <section id="slide-ready" class="w-full max-w-2xl mx-auto space-y-6 transition-all duration-500 hidden">
-      <div class="glass-panel rounded-3xl p-8 md:p-10 text-center space-y-6">
-        <div class="inline-flex p-4 rounded-2xl bg-[#2f6fc4]/20 border border-[#2f6fc4]/40 text-[#2f6fc4] glow-ispi mb-2">
-          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-          </svg>
-        </div>
-
-        <div class="space-y-3">
-          <h2 class="text-3xl font-extrabold text-white tracking-tight">
-            Preparado para la Evaluación Técnica
-          </h2>
-          <p class="text-sm text-slate-300 leading-relaxed">
-            Estás a punto de iniciar el cuestionario técnico de infraestructura de redes. La prueba consta de 18 preguntas estructuradas en orden creciente de complejidad.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3 pt-2 text-left font-mono text-xs">
-          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
-            <span class="block text-[#2f6fc4] font-bold mb-1">6 Preguntas</span>
-            <span class="text-slate-400">Nivel Básico</span>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
-            <span class="block text-[#7ac143] font-bold mb-1">6 Preguntas</span>
-            <span class="text-slate-400">Nivel Intermedio</span>
-          </div>
-          <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
-            <span class="block text-[#e8672a] font-bold mb-1">6 Preguntas</span>
-            <span class="text-slate-400">Nivel Avanzado</span>
-          </div>
-        </div>
-
-        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-left text-xs text-slate-400 space-y-1 font-mono">
-          <p class="text-slate-300 font-semibold">📌 Indicaciones:</p>
-          <ul class="list-disc list-inside space-y-1 text-slate-400">
-            <li>Sus respuestas se guardan automáticamente en vivo.</li>
-            <li>Al finalizar se generará el reporte `.txt` oficial firmado.</li>
-          </ul>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800">
-          <button id="btn-back-to-devs" class="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-sm font-medium transition-all">
-            ← Volver a Dispositivos
-          </button>
-          <button id="btn-start-quiz" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-[#7ac143] to-[#2f6fc4] hover:from-[#8bd053] hover:to-[#3e7dd4] text-white font-bold text-sm tracking-wide shadow-lg shadow-[#7ac143]/20 transition-all border border-[#7ac143]/40">
-            Comenzar Evaluación →
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SLIDE 3: QUIZ CONTAINER -->
-    <section id="slide-quiz" class="w-full max-w-3xl mx-auto space-y-6 transition-all duration-500 hidden">
+    <!-- COLUMNA IZQUIERDA: INFRAESTRUCTURA DE REDES EN 4 NIVELES -->
+    <section class="lg:col-span-1 space-y-3">
+      <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Arquitectura Evaluada</h2>
       
-      <!-- PROGRESS HEADER -->
-      <div class="glass-panel rounded-2xl p-5 space-y-3">
-        <div class="flex items-center justify-between text-xs font-mono">
-          <span id="quiz-progress-text" class="text-[#2f6fc4] font-bold">Pregunta 1 de 18</span>
-          <span id="quiz-badge-diff" class="px-2.5 py-0.5 rounded-full bg-[#2f6fc4]/20 text-[#2f6fc4] border border-[#2f6fc4]/40">
-            Básico
-          </span>
-        </div>
-        <!-- Progress bar -->
-        <div class="w-full h-2.5 rounded-full bg-slate-900 overflow-hidden p-0.5 border border-slate-800">
-          <div id="quiz-progress-bar" class="h-full rounded-full bg-gradient-to-r from-[#2f6fc4] via-[#7ac143] to-[#e8672a] transition-all duration-300" style="width: 5.55%;"></div>
+      <!-- LAYER 1 -->
+      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
+        <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-lg flex items-center justify-center border border-indigo-500/20 font-bold">L1</div>
+        <div>
+          <div class="text-xs font-bold text-white">Capa Física</div>
+          <div class="text-[10px] text-slate-400">NIC, Repetidor, Medios</div>
         </div>
       </div>
 
-      <!-- QUESTION CARD -->
-      <div id="question-card" class="glass-panel rounded-3xl p-6 md:p-8 space-y-6 min-h-[380px] flex flex-col justify-between">
-        <div class="space-y-4">
-          <div class="flex items-start justify-between gap-4">
-            <h3 id="question-title" class="text-lg md:text-xl font-bold text-white leading-snug">
-              Cargando pregunta...
-            </h3>
-          </div>
-          <div id="options-container" class="space-y-3 pt-2">
-            <!-- Options dynamically injected here -->
-          </div>
-        </div>
-
-        <!-- NAVIGATION CONTROLS -->
-        <div class="flex items-center justify-between pt-6 border-t border-slate-800/80">
-          <button id="btn-prev-q" class="px-5 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-            ← Anterior
-          </button>
-
-          <span id="answers-counter" class="text-xs font-mono text-slate-400">
-            0/18 Respondidas
-          </span>
-
-          <button id="btn-next-q" class="px-6 py-2.5 rounded-xl bg-[#2f6fc4] hover:bg-[#3d7ed2] text-white font-bold text-sm transition-all shadow-md shadow-[#2f6fc4]/20 border border-[#2f6fc4]/40">
-            Siguiente →
-          </button>
+      <!-- LAYER 2 -->
+      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
+        <div class="w-10 h-10 bg-sky-500/10 text-sky-400 rounded-lg flex items-center justify-center border border-sky-500/20 font-bold">L2</div>
+        <div>
+          <div class="text-xs font-bold text-white">Capa Enlace</div>
+          <div class="text-[10px] text-slate-400">Switch, VLANs, CAM, MAC</div>
         </div>
       </div>
 
-      <!-- FINISH RESULT CARD (HIDDEN INITIALLY) -->
-      <div id="quiz-finish-card" class="glass-panel rounded-3xl p-8 text-center space-y-6 hidden">
-        <div class="inline-flex p-4 rounded-full bg-[#7ac143]/20 border border-[#7ac143]/40 text-[#7ac143]">
-          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div class="space-y-2">
-          <h2 class="text-2xl md:text-3xl font-extrabold text-white">Evaluación Completada</h2>
-          <p class="text-sm text-slate-300">
-            Ha respondido todas las consignas del examen. Descargue el comprobante oficial para entregarlo a su docente.
-          </p>
-        </div>
-
-        <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 max-w-md mx-auto text-left font-mono text-xs space-y-2">
-          <div class="flex justify-between">
-            <span class="text-slate-400">Institución:</span>
-            <span class="text-slate-200">ISPI 4019</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">Total Respuestas:</span>
-            <span id="final-total-count" class="text-[#7ac143] font-bold">18 / 18</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-400">Estado:</span>
-            <span class="text-[#2f6fc4] font-bold">LISTO PARA REVISIÓN</span>
-          </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-          <button id="btn-download-txt" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#7ac143] to-[#2f6fc4] hover:from-[#8bd053] hover:to-[#3e7dd4] text-white font-bold text-sm tracking-wide shadow-xl shadow-[#7ac143]/20 transition-all flex items-center justify-center space-x-2 border border-[#7ac143]/40">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-            </svg>
-            <span>Descargar Reporte (.txt)</span>
-          </button>
-          <button id="btn-restart-quiz" class="w-full sm:w-auto px-5 py-3.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-sm font-medium transition-all">
-            Reiniciar
-          </button>
+      <!-- LAYER 3 -->
+      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
+        <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center border border-emerald-500/20 font-bold">L3</div>
+        <div>
+          <div class="text-xs font-bold text-white">Capa Red</div>
+          <div class="text-[10px] text-slate-400">Router, NAT, Subnetting, Gateway</div>
         </div>
       </div>
+
+      <!-- LAYER 4 -->
+      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
+        <div class="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center border border-rose-500/20 font-bold">L4</div>
+        <div>
+          <div class="text-xs font-bold text-white">Seguridad & Servicios</div>
+          <div class="text-[10px] text-slate-400">Firewall, Access Point, Servidor</div>
+        </div>
+      </div>
+
+      <!-- MAPA DE NAVEGACIÓN -->
+      <div class="mt-6 pt-4 border-t border-slate-800">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Mapa de Preguntas</h3>
+        <div id="questionMap" class="grid grid-cols-6 gap-2"></div>
+      </div>
+    </section>
+
+    <!-- COLUMNA DERECHA: CONCORDANCIA Y PREGUNTAS -->
+    <section class="lg:col-span-3 flex flex-col justify-between bg-slate-900/80 border border-slate-800 rounded-2xl p-6 backdrop-blur-md">
+      
+      <!-- HEADER DE PREGUNTA -->
+      <div>
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+          <span id="levelBadge" class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/30 rounded-full text-xs font-bold">Nivel 1</span>
+          <span id="questionCounter" class="text-xs text-slate-400 font-mono">Pregunta 1 de 12</span>
+        </div>
+
+        <h3 id="questionText" class="text-base sm:text-lg font-medium text-slate-100 mb-6 leading-relaxed">
+          Cargando consigna...
+        </h3>
+
+        <!-- OPCIONES DE RESPUESTA -->
+        <div id="optionsContainer" class="space-y-3 mb-6"></div>
+
+        <!-- CAJA DE PISTA TECNOLÓGICA -->
+        <div id="hintBox" class="hidden p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-200 mb-6"></div>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800">
+        <button id="btnHint" onclick="requestHint()" class="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center gap-2">
+          💡 Solicitar Pista Compleja (-1 Crédito)
+        </button>
+
+        <div class="flex gap-3">
+          <button id="btnPrev" onclick="navigateQuestion(-1)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition disabled:opacity-40">Anterior</button>
+          <button id="btnNext" onclick="navigateQuestion(1)" class="px-6 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-sky-900/40">Siguiente</button>
+          <button id="btnSubmitExam" onclick="openStudentModal()" class="hidden px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-900/40">Finalizar Examen</button>
+        </div>
+      </div>
+
     </section>
 
   </main>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- MODAL DE DATOS DEL ALUMNO Y ENVÍO DIRECTO AL PROFESOR -->
+  <div id="studentModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+      <h3 class="text-xl font-bold text-white mb-1">Finalizar Evaluación</h3>
+      <p class="text-xs text-slate-400 mb-6">Ingresa tus datos personales completos para registrar la entrega. El informe se enviará de forma automática y directa a la casilla del docente.</p>
+
+      <form id="studentForm" onsubmit="submitExamAndSendEmail(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Nombre y Apellido del Alumno *</label>
+          <input type="text" id="studentName" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">DNI / Documento *</label>
+            <input type="text" id="studentDni" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Año / Cátedra *</label>
+            <input type="text" id="studentYear" value="1er Año - ISPI 4019" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Carrera *</label>
+          <input type="text" id="studentCareer" value="Tecnicatura en Redes e Infraestructura" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico del Profesor *</label>
+          <input type="email" id="teacherEmail" placeholder="profesor@instituto.edu.ar" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+        </div>
+
+        <div class="pt-4 flex justify-end gap-3">
+          <button type="button" onclick="closeStudentModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Volver</button>
+          <button type="submit" id="btnConfirmSend" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-900/40">Enviar Examen Directo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT DE LÓGICA COMPLETA Y BANCO RIGUROSO -->
   <script>
-    // ==========================================
-    // 1. ANIMATED CANVAS BACKGROUND (ISPI Colors: Blue, Green, Orange, Navy)
-    // ==========================================
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let animId = null;
-    let isCanvasActive = true;
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    const ispiPalette = ['#2f6fc4', '#7ac143', '#e8672a', '#2f2a73', '#38bdf8'];
-
-    // Globe particles & Wireframe Nodes
-    const globeRadius = Math.min(canvas.width, canvas.height) * 0.28;
-    const nodes = [];
-    const nodeCount = 140;
-
-    for (let i = 0; i < nodeCount; i++) {
-      const phi = Math.acos(-1 + (2 * i) / nodeCount);
-      const theta = Math.sqrt(nodeCount * Math.PI) * phi;
-      nodes.push({
-        x: globeRadius * Math.cos(theta) * Math.sin(phi),
-        y: globeRadius * Math.sin(theta) * Math.sin(phi),
-        z: globeRadius * Math.cos(phi),
-        baseX: 0, baseY: 0, baseZ: 0,
-        color: ispiPalette[i % ispiPalette.length]
-      });
-    }
-
-    // Binary code streams
-    const binaryStreams = [];
-    const streamCount = 45;
-    for (let i = 0; i < streamCount; i++) {
-      binaryStreams.push({
-        x: (Math.random() - 0.5) * canvas.width * 1.5,
-        y: (Math.random() - 0.5) * canvas.height * 1.5,
-        z: (Math.random() - 0.5) * 800,
-        speed: 1.5 + Math.random() * 3,
-        text: Math.random() > 0.5 ? '1' : '0',
-        color: ispiPalette[i % ispiPalette.length]
-      });
-    }
-
-    let angleX = 0.002;
-    let angleY = 0.003;
-
-    function drawCanvas() {
-      if (!isCanvasActive) return;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-
-      // Rotate Nodes
-      const cosX = Math.cos(angleX);
-      const sinX = Math.sin(angleX);
-      const cosY = Math.cos(angleY);
-      const sinY = Math.sin(angleY);
-
-      const projected = [];
-
-      nodes.forEach((node) => {
-        let x1 = node.x * cosY - node.z * sinY;
-        let z1 = node.z * cosY + node.x * sinY;
-
-        let y1 = node.y * cosX - z1 * sinX;
-        let z2 = z1 * cosX + node.y * sinX;
-
-        node.x = x1;
-        node.y = y1;
-        node.z = z2;
-
-        const scale = 400 / (400 + z2 + 200);
-        const px = cx + x1 * scale;
-        const py = cy + y1 * scale;
-
-        projected.push({ x: px, y: py, z: z2, scale, color: node.color });
-      });
-
-      // Draw wireframe connections
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i < projected.length; i++) {
-        for (let j = i + 1; j < projected.length; j++) {
-          const dx = projected[i].x - projected[j].x;
-          const dy = projected[i].y - projected[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 65) {
-            const alpha = (1 - dist / 65) * 0.25 * ((projected[i].z + globeRadius) / (2 * globeRadius));
-            ctx.strokeStyle = `rgba(47, 111, 196, ${alpha})`;
-            ctx.beginPath();
-            ctx.moveTo(projected[i].x, projected[i].y);
-            ctx.lineTo(projected[j].x, projected[j].y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw nodes
-      projected.forEach((p) => {
-        const alpha = Math.max(0.1, (p.z + globeRadius) / (2 * globeRadius));
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, Math.max(1, 2.5 * p.scale), 0, Math.PI * 2);
-        ctx.fill();
-      });
-      ctx.globalAlpha = 1.0;
-
-      // Draw Binary streams
-      ctx.font = '11px "JetBrains Mono", monospace';
-      binaryStreams.forEach((bs) => {
-        bs.z -= bs.speed;
-        if (bs.z < -300) {
-          bs.z = 500;
-          bs.x = (Math.random() - 0.5) * canvas.width * 1.2;
-          bs.y = (Math.random() - 0.5) * canvas.height * 1.2;
-        }
-
-        const scale = 300 / (300 + bs.z);
-        const px = cx + bs.x * scale;
-        const py = cy + bs.y * scale;
-
-        if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
-          ctx.fillStyle = bs.color;
-          ctx.globalAlpha = Math.min(1, Math.max(0.1, scale * 0.7));
-          ctx.fillText(bs.text, px, py);
-        }
-      });
-      ctx.globalAlpha = 1.0;
-
-      animId = requestAnimationFrame(drawCanvas);
-    }
-
-    function startCanvas() {
-      if (!isCanvasActive) {
-        isCanvasActive = true;
-        document.getElementById('bg-canvas').style.opacity = '1';
-        document.getElementById('bg-glow').style.opacity = '1';
-        drawCanvas();
-      }
-    }
-
-    function stopCanvas() {
-      isCanvasActive = false;
-      document.getElementById('bg-canvas').style.opacity = '0';
-      document.getElementById('bg-glow').style.opacity = '0.3';
-      if (animId) cancelAnimationFrame(animId);
-    }
-
-    drawCanvas();
-
-    // ==========================================
-    // 2. QUESTION DATASET
-    // ==========================================
+    // === BANCO DE PREGUNTAS TÉCNICO DE ALTA DIFICULTAD Y PREGUNTAS TRAMPA ===
     const questions = [
-      { id: 1, diff: 'Básico', title: '1. ¿En qué capa del modelo OSI opera un Switch tradicional de capa de enlace?', options: ['A) Capa 1 - Física', 'B) Capa 2 - Enlace de Datos', 'C) Capa 3 - Red', 'D) Capa 4 - Transporte'], correct: 1 },
-      { id: 2, diff: 'Básico', title: '2. ¿Cuál es el conector estándar utilizado en el cableado estructurado par trenzado UTP Cat6?', options: ['A) RJ-11', 'B) BNC', 'C) RJ-45', 'D) LC/UPC'], correct: 2 },
-      { id: 3, diff: 'Básico', title: '3. ¿Qué dirección física de 48 bits grabada en la NIC identifica unívocamente a una interfaz de red?', options: ['A) Dirección IP', 'B) Dirección MAC', 'C) Máscara de Subred', 'D) Puerta de Enlace (Gateway)'], correct: 1 },
-      { id: 4, diff: 'Básico', title: '4. ¿Cuál de los siguientes comandos permite verificar la conectividad de capa 3 enviando mensajes ICMP Echo Request?', options: ['A) ipconfig /all', 'B) netstat -a', 'C) ping', 'D) nslookup'], correct: 2 },
-      { id: 5, diff: 'Básico', title: '5. ¿Qué dispositivo tiene como función principal conmutar tramas entre redes totalmente distintas y determinar rutas óptimas IP?', options: ['A) Hub', 'B) Router', 'C) Repetidor Wi-Fi', 'D) Patch Panel'], correct: 1 },
-      { id: 6, diff: 'Básico', title: '6. ¿Cuál es la máscara de subred por defecto para una dirección IP IPv4 de Clase C (/24)?', options: ['A) 255.0.0.0', 'B) 255.255.0.0', 'C) 255.255.255.0', 'D) 255.255.255.240'], correct: 2 },
-      { id: 7, diff: 'Intermedio', title: '7. ¿Qué protocolo asigna dinámicamente direcciones IP, máscaras y DNS a los clientes de la red local?', options: ['A) DNS', 'B) DHCP', 'C) ARP', 'D) ICMP'], correct: 1 },
-      { id: 8, diff: 'Intermedio', title: '8. ¿Qué protocolo resuelve una dirección IP conocida a su correspondiente dirección física MAC en una LAN?', options: ['A) RARP', 'B) ARP', 'C) DNS', 'D) DHCP'], correct: 1 },
-      { id: 9, diff: 'Intermedio', title: '9. En la norma T568B de cableado estructurado, ¿cuál es el orden exacto del primer par de hilos?', options: ['A) Blanco/Verde - Verde', 'B) Blanco/Naranja - Naranja', 'C) Blanco/Azul - Azul', 'D) Blanco/Marrón - Marrón'], correct: 1 },
-      { id: 10, diff: 'Intermedio', title: '10. ¿Cuál es la finalidad técnica de segmentar una red mediante VLANs (Virtual LANs) en un Switch L2/L3?', options: ['A) Aumentar la velocidad del cable UTP', 'B) Reducir dominios de broadcast y mejorar la seguridad', 'C) Reemplazar la necesidad de direcciones IP', 'D) Asignar IPs públicas automáticamente'], correct: 1 },
-      { id: 11, diff: 'Intermedio', title: '11. ¿Qué protocolo de capa de transporte es no orientado a conexión, sin garantía de entrega pero con menor latencia?', options: ['A) TCP', 'B) UDP', 'C) SCTP', 'D) SSH'], correct: 1 },
-      { id: 12, diff: 'Intermedio', title: '12. Dada la red 192.168.10.0/26, ¿cuántas direcciones IP utilizables para hosts hay disponibles por subred?', options: ['A) 254', 'B) 126', 'C) 62', 'D) 30'], correct: 2 },
-      { id: 13, diff: 'Avanzado', title: '13. ¿Qué mecanismo del protocolo TCP evita la congestión ajustando la cantidad de segmentos enviados antes de recibir un ACK?', options: ['A) Handshake de 3 vías', 'B) Ventana Deslizante (Sliding Window)', 'C) Control de Paridad', 'D) Encabezado MSS'], correct: 1 },
-      { id: 14, diff: 'Avanzado', title: '14. ¿Qué protocolo evita bucles (loops) de capa 2 en redes Ethernet con enlaces redundantes bloqueando puertos de manera lógica?', options: ['A) LACP (802.3ad)', 'B) STP (Spanning Tree Protocol - 802.1D)', 'C) OSPF', 'D) VRRP'], correct: 1 },
-      { id: 15, diff: 'Avanzado', title: '15. En un enlace Troncal (Trunk) 802.1Q entre dos Switches, ¿cómo se identifican las tramas pertenecientes a distintas VLANs?', options: ['A) Mediante encapsulado en túneles GRE', 'B) Insertando un Tag de 4 bytes en el encabezado Ethernet', 'C) Modificando la dirección MAC origen', 'D) Asignando un puerto TCP diferente'], correct: 1 },
-      { id: 16, diff: 'Avanzado', title: '16. ¿Qué técnica permite traducir múltiples direcciones IP privadas a una sola dirección IP pública utilizando puertos efímeros?', options: ['A) Static NAT', 'B) PAT (Port Address Translation) / NAT Overload', 'C) Dynamic Routing', 'D) Proxy Inverso'], correct: 1 },
-      { id: 17, diff: 'Avanzado', title: '17. ¿Qué protocolo de enrutamiento dinámico de estado de enlace (Link-State) utiliza el algoritmo Dijkstra para calcular el camino más corto?', options: ['A) RIPv2', 'B) BGP', 'C) OSPF', 'D) EIGRP'], correct: 2 },
-      { id: 18, diff: 'Avanzado', title: '18. ¿Cuál es el propósito del estándar IEEE 802.1X en la seguridad de infraestructura de redes local?', options: ['A) Cifrar enlaces de fibra óptica', 'B) Control de acceso a la red basado en puertos mediante autenticación RADIUS', 'C) Balanceo de carga en servidores Web', 'D) Asignación estática de direcciones MAC'], correct: 1 }
+      // --- NIVEL 1: CAPA FÍSICA Y MEDIOS ---
+      {
+        id: 1,
+        level: "Nivel 1 - Capa Física",
+        q: "Si un Repetidor de Capa 1 recibe una trama Ethernet que contiene errores de verificación de secuencia (FCS corrupto por ruido en el cable), ¿qué acción ejecutará el dispositivo?",
+        options: [
+          "Descarta inmediatamente la trama e informa al emisor mediante un mensaje de error ICMP.",
+          "Regenera y retemporiza la señal eléctrica, retransmitiendo los bits corruptos por todos sus puertos activos.",
+          "Almacena la trama en su búfer interno hasta recibir la retransmisión del protocolo TCP.",
+          "Calcula nuevamente el campo FCS para corregir el error antes de reenviar los bits."
+        ],
+        correct: 1,
+        hint: "Recuerda la premisa fundamental de la Capa 1: los dispositivos físicos no leen cabeceras, no entienden tramas ni calculan checksums; únicamente interpretan y amplifican voltajes o impulsos de luz."
+      },
+      {
+        id: 2,
+        level: "Nivel 1 - Capa Física",
+        q: "Una interfaz de red (NIC) está configurada en modo Half-Duplex sobre un medio guiado de cobre. ¿En qué momento se activará la detección de colisiones (CSMA/CD)?",
+        options: [
+          "Únicamente al momento de establecer la negociación del handshake TCP de tres vías.",
+          "Cuando el buffer de la interfaz sobrepasa la tasa MDIX configurada.",
+          "Durante la transmisión, si la NIC detecta tensión o señal física en el medio mientras ella misma está intentando transmitir.",
+          "Cuando el switch de borde descarta la trama por falta de coincidencia de VLAN."
+        ],
+        correct: 2,
+        hint: "En Half-Duplex la transmisión y la recepción comparten el mismo medio físico. Analiza qué evento físico le indica al hardware que dos emisores hablaron al mismo tiempo."
+      },
+      {
+        id: 3,
+        level: "Nivel 1 - Capa Física",
+        q: "Se instala un enlace de Fibra Óptica Monomodo (SMF) en lugar de Multimodo (MMF) para interconectar dos racks principales. ¿Cuál es el factor físico que permite a la fibra monomodo alcanzar distancias mucho mayores?",
+        options: [
+          "Posee un núcleo extremadamente delgado que permite un único modo o trayectoria de propagación de la luz, eliminando la dispersión modal.",
+          "Utiliza múltiples ases de luz LED de diferente longitud de onda rebotando en los bordes del revestimiento.",
+          "Transporta impulsos de corriente continua a través de un filamento dieléctrico de cobre recubierto.",
+          "Aplica un blindaje metálico interno (STP) que bloquea campos electromagnéticos externos."
+        ],
+        correct: 0,
+        hint: "Compara el diámetro del núcleo entre SMF y MMF. Piensa en el efecto del 'rebote' de los rayos de luz sobre las paredes del cristal."
+      },
+
+      // --- NIVEL 2: CAPA DE ENLACE Y CONMUTACIÓN ---
+      {
+        id: 4,
+        level: "Nivel 2 - Capa Enlace",
+        q: "Un Switch de Capa 2 recibe una trama Unicast cuyo destino es la MAC `00:1A:2B:3C:4D:5E`. Al consultar su tabla CAM, el switch advierte que dicha dirección NO está registrada. ¿Qué acción ejecuta?",
+        options: [
+          "Envía de inmediato una solicitud ARP Broadcast para averiguar en qué puerto está esa dirección MAC.",
+          "Descarta la trama inmediatamente por tratarse de una violación de seguridad de puerto.",
+          "Efectúa un 'Unknown Unicast Flooding', reenviando la trama por todos los puertos de esa misma VLAN, excepto el puerto por donde ingresó.",
+          "Encapsula la trama en un paquete de diagnóstico ICMP y la envía al Gateway por defecto."
+        ],
+        correct: 2,
+        hint: "El switch no genera tráfico ARP propio para tráfico de paso de usuarios; su mecanismo básico ante una dirección desconocida es replicar el mensaje a su dominio de broadcast."
+      },
+      {
+        id: 5,
+        level: "Nivel 2 - Capa Enlace",
+        q: "Un puerto de enlace tronco (Trunk 802.1Q) recibe una trama sin etiqueta (untagged). ¿A qué VLAN asignará el switch esta trama para procesar su reenvío?",
+        options: [
+          "Será rechazada automáticamente por no contener el encabezado de 4 bytes 802.1Q.",
+          "Será procesada en la VLAN Nativa configurada explícitamente en dicho puerto de enlace tronco.",
+          "Se asignará automáticamente a la VLAN de administración (por defecto VLAN 99).",
+          "Se transmitirá en formato de broadcast a todas las VLANs existentes en la base de datos VTP."
+        ],
+        correct: 1,
+        hint: "Revisa el concepto de VLAN Nativa en enlaces trunking y cómo el estándar 802.1Q maneja el tráfico hacia dispositivos no compatibles con etiquetado."
+      },
+      {
+        id: 6,
+        level: "Nivel 2 - Capa Enlace",
+        q: "En una red con redundancia de Switches, el protocolo Spanning Tree (STP) ha culminado su convergencia. ¿Qué ocurre con un puerto que ha quedado en estado de 'Blocking' (Bloqueado)?",
+        options: [
+          "No transmite ni recibe tramas de datos de usuarios, pero continúa escuchando y procesando BPDU para detectar cambios de topología.",
+          "Apaga físicamente el enlace eléctrico del puerto para evitar el consumo de energía.",
+          "Reenvía únicamente tramas de control ICMP y peticiones de asignación de IP por DHCP.",
+          "Permite la salida de datos de usuarios pero bloquea la entrada para evitar bucles."
+        ],
+        correct: 0,
+        hint: "Estar bloqueado lógicamente para datos de usuarios no significa estar 'ciego' a la topología. El switch debe saber si el enlace principal falla."
+      },
+
+      // --- NIVEL 3: CAPA DE RED Y ENRUTAMIENTO ---
+      {
+        id: 7,
+        level: "Nivel 3 - Capa Red",
+        q: "El Host A (`192.168.1.100 /25`) desea enviar un paquete IP al Host B (`192.168.1.130 /25`). ¿Cómo resolverá el Host A la entrega de este paquete a nivel de capa de red?",
+        options: [
+          "Determinará que el Host B está en su misma subred local y emitirá un ARP Request por la MAC directa del Host B.",
+          "Determinará que el Host B pertenece a una subred remota y enviará la trama a la dirección MAC de su Gateway por defecto.",
+          "El Host A cambiará automáticamente su máscara a /24 para poder comunicarse de forma local sin router.",
+          "Enviará el paquete directamente por Broadcast a la IP `255.255.255.255`."
+        ],
+        correct: 1,
+        hint: "Calcula el rango útil de la subred /25 (128 direcciones por bloque). Compara en qué bloque caen el `.100` y el `.130`."
+      },
+      {
+        id: 8,
+        level: "Nivel 3 - Capa Red",
+        q: "Al configurar PAT (Port Address Translation / NAT Overload) en un Router de borde, ¿qué elemento permite que cientos de hosts con IPs privadas compartan una única IP pública simultáneamente?",
+        options: [
+          "La modificación de la dirección MAC de origen en cada salto de capa 2.",
+          "La asignación de una máscara de subred dinámicamente variable en el encabezado IP.",
+          "El mapeo único de números de puertos de origen (L4) combinados con la IP pública en la tabla de traducciones.",
+          "El uso obligatorio de tunelización cifrada IPsec sobre la interfaz WAN."
+        ],
+        correct: 2,
+        hint: "Diferencia NAT Estático/Dinámico de PAT. Observa qué capa del modelo OSI aporta los números de puerto (TCP/UDP) para diferenciar las sesiones."
+      },
+      {
+        id: 9,
+        level: "Nivel 3 - Capa Red",
+        q: "Un Router recibe un paquete IP destinado a la dirección `10.10.4.50`. En su tabla de enrutamiento cuenta con las siguientes tres rutas coincidentes. ¿Cuál elegirá para reenviar el paquete?",
+        options: [
+          "Ruta A: `10.10.0.0 /16` vía FastEthernet 0/0",
+          "Ruta B: `10.10.4.0 /24` vía GigabitEthernet 0/1",
+          "Ruta C: `10.10.4.32 /27` vía GigabitEthernet 0/2",
+          "Descartará el paquete por existir ambigüedad de rutas hacia un mismo destino."
+        ],
+        correct: 2,
+        hint: "Aplica la regla de oro del enrutamiento IP: 'Longest Prefix Match' (Coincidencia del prefijo más largo o máscara más específica)."
+      },
+
+      // --- NIVEL 4: SEGURIDAD Y SERVICIOS ---
+      {
+        id: 10,
+        level: "Nivel 4 - Seguridad & Servicios",
+        q: "En un Firewall con inspección con estado (Stateful Firewall), un usuario interno inicia una sesión HTTPS (puerto 443) hacia un servidor web externo. ¿Por qué el tráfico de retorno ingresa a la red interna sin ser bloqueado por las reglas predeterminadas?",
+        options: [
+          "Porque el Firewall convierte temporalmente el puerto 443 en un puerto broadcast inseguro.",
+          "Porque el Firewall analiza la tabla de estados e identifica que el paquete entrante pertenece a una conexión legítima previamente iniciada desde el interior.",
+          "Porque todas las conexiones HTTPS omiten la revisión de capa 3/4 por venir cifradas.",
+          "Porque el servidor web externo envía un paquete ICMP de autorización previa."
+        ],
+        correct: 1,
+        hint: "Los firewalls con estado recuerdan las solicitudes salientes activas en su 'State Table', permitiendo la respuesta correspondiente automáticamente."
+      },
+      {
+        id: 11,
+        level: "Nivel 4 - Seguridad & Servicios",
+        q: "En una infraestructura Wi-Fi Enterprise con autenticación WPA3-Enterprise 802.1X, ¿cuál es el rol exacto que cumple el Access Point (AP) durante el proceso de inicio de sesión?",
+        options: [
+          "Verifica las contraseñas comparándolas directamente contra su propia base de datos local Active Directory.",
+          "Actúa como un autenticador/pasarela (Pass-through), retransmitiendo los mensajes EAP entre el cliente inalámbrico y el servidor RADIUS.",
+          "Cifra las credenciales usando una clave PSK compartida por todos los usuarios de la celda.",
+          "Asigna inmediatamente la IP pública mediante un agente DHCP embebido en la antena."
+        ],
+        correct: 1,
+        hint: "En 802.1X hay 3 actores: Suplicante (cliente), Autenticador (AP/Switch) y Servidor de Autenticación (RADIUS). El AP no valida credenciales, solo las transporta."
+      },
+      {
+        id: 12,
+        level: "Nivel 4 - Seguridad & Servicios",
+        q: "Un administrador de red consulta un Servidor DNS para resolver el nombre `aula.ispi4019.edu.ar`. Si el servidor local responde indicando que posee un registro tipo 'CNAME', ¿qué información está entregando?",
+        options: [
+          "La dirección IP IPv6 nativa asignada directamente a dicho dominio.",
+          "El servidor de correo electrónico (Mail Exchanger) autoritativo de la institución.",
+          "Un alias o nombre canónico que apunta a otro nombre de dominio FQDN oficial.",
+          "La dirección MAC física de la tarjeta de red del servidor web que aloja la página."
+        ],
+        correct: 2,
+        hint: "Diferencia los registros de zona DNS principales: 'A' (IPv4), 'AAAA' (IPv6), 'MX' (Correo) y 'CNAME' (Nombre Canónico/Alias)."
+      }
     ];
 
-    // ==========================================
-    // 3. PERSISTENCE & NAVIGATION
-    // ==========================================
-    let currentQuestionIndex = 0;
+    // ESTADO DEL EXAMEN
+    let currentIdx = 0;
     let userAnswers = {};
+    let lockedQuestions = {};
+    let hintsUsed = {};
+    let hintsLeft = 3;
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let incidentsCount = 0;
 
-    try {
-      const saved = sessionStorage.getItem('ispi_quiz_answers');
-      if (saved) userAnswers = JSON.parse(saved);
-    } catch (e) {}
+    // INICIALIZACIÓN
+    window.onload = function() {
+      initCanvas();
+      loadLocalStorage();
+      renderQuestion();
+      renderMap();
+      
+      // Detección de salida de pantalla completa / cambio de pestaña
+      document.addEventListener("visibilitychange", function() {
+        if (document.hidden) {
+          incidentsCount++;
+          saveLocalStorage();
+        }
+      });
+    };
 
-    function saveAnswers() {
-      try {
-        sessionStorage.setItem('ispi_quiz_answers', JSON.stringify(userAnswers));
-      } catch (e) {}
+    // MODO PANTALLA COMPLETA OBLIGATORIO
+    function startExamInKiosk() {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(() => {});
+      }
+      document.getElementById('kioskModal').classList.add('hidden');
+      startTimer();
     }
 
-    const slideDevs = document.getElementById('slide-devs');
-    const slideReady = document.getElementById('slide-ready');
-    const slideQuiz = document.getElementById('slide-quiz');
+    // CRONÓMETRO
+    function startTimer() {
+      if (!timerInterval) {
+        timerInterval = setInterval(() => {
+          timerSeconds++;
+          const min = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+          const sec = (timerSeconds % 60).toString().padStart(2, '0');
+          document.getElementById('timerDisplay').innerText = `${min}:${sec}`;
+          saveLocalStorage();
+        }, 1000);
+      }
+    }
 
-    function showSlide(slide) {
-      slideDevs.classList.add('hidden');
-      slideReady.classList.add('hidden');
-      slideQuiz.classList.add('hidden');
+    // RENDERIZAR PREGUNTA
+    function renderQuestion() {
+      const q = questions[currentIdx];
+      document.getElementById('levelBadge').innerText = q.level;
+      document.getElementById('questionCounter').innerText = `Pregunta ${currentIdx + 1} de ${questions.length}`;
+      document.getElementById('questionText').innerText = q.q;
 
-      if (slide === 'devs') {
-        slideDevs.classList.remove('hidden');
-        startCanvas();
-      } else if (slide === 'ready') {
-        slideReady.classList.remove('hidden');
-        startCanvas();
-      } else if (slide === 'quiz') {
-        slideQuiz.classList.remove('hidden');
-        stopCanvas();
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+
+      const isLocked = lockedQuestions[currentIdx];
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left p-4 rounded-xl border transition text-xs sm:text-sm flex items-center justify-between leading-relaxed ${
+          userAnswers[currentIdx] === idx 
+            ? 'bg-sky-600/20 border-sky-500 text-sky-200 font-medium' 
+            : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700'
+        } ${isLocked ? 'cursor-not-allowed opacity-75' : ''}`;
+
+        btn.disabled = isLocked;
+        btn.innerHTML = `<span class="pr-2">${opt}</span> ${userAnswers[currentIdx] === idx ? '<span class="text-sky-400 font-bold shrink-0">✓</span>' : ''}`;
+        btn.onclick = () => selectOption(idx);
+        container.appendChild(btn);
+      });
+
+      // Pista
+      const hintBox = document.getElementById('hintBox');
+      if (hintsUsed[currentIdx]) {
+        hintBox.innerText = `💡 PISTA TECNOLÓGICA: ${q.hint}`;
+        hintBox.classList.remove('hidden');
+      } else {
+        hintBox.classList.add('hidden');
+      }
+
+      // Botón Pista
+      document.getElementById('btnHint').disabled = hintsLeft <= 0 || hintsUsed[currentIdx] || isLocked;
+
+      // Navegación
+      document.getElementById('btnPrev').disabled = currentIdx === 0;
+      if (currentIdx === questions.length - 1) {
+        document.getElementById('btnNext').classList.add('hidden');
+        document.getElementById('btnSubmitExam').classList.remove('hidden');
+      } else {
+        document.getElementById('btnNext').classList.remove('hidden');
+        document.getElementById('btnSubmitExam').classList.add('hidden');
+      }
+
+      renderMap();
+    }
+
+    // SELECCIONAR OPCIÓN
+    function selectOption(optIdx) {
+      if (lockedQuestions[currentIdx]) return;
+      userAnswers[currentIdx] = optIdx;
+      saveLocalStorage();
+      renderQuestion();
+    }
+
+    // NAVEGAR PREGUNTAS (BLOQUEA LA ANTERIOR AL AVANZAR)
+    function navigateQuestion(dir) {
+      if (dir > 0 && userAnswers[currentIdx] !== undefined) {
+        lockedQuestions[currentIdx] = true;
+      }
+      currentIdx += dir;
+      saveLocalStorage();
+      renderQuestion();
+    }
+
+    // SOLICITAR PISTA
+    function requestHint() {
+      if (hintsLeft > 0 && !hintsUsed[currentIdx]) {
+        hintsLeft--;
+        hintsUsed[currentIdx] = true;
+        document.getElementById('hintsLeftDisplay').innerText = `${hintsLeft} DISPONIBLES`;
+        saveLocalStorage();
         renderQuestion();
       }
     }
 
-    document.getElementById('btn-to-ready').addEventListener('click', () => showSlide('ready'));
-    document.getElementById('btn-back-to-devs').addEventListener('click', () => showSlide('devs'));
-    document.getElementById('btn-start-quiz').addEventListener('click', () => showSlide('quiz'));
+    // MAPA DE PREGUNTAS
+    function renderMap() {
+      const mapContainer = document.getElementById('questionMap');
+      mapContainer.innerHTML = '';
+      questions.forEach((_, idx) => {
+        const item = document.createElement('button');
+        const isCurrent = idx === currentIdx;
+        const isAnswered = userAnswers[idx] !== undefined;
+        const isLocked = lockedQuestions[idx];
 
-    // ==========================================
-    // 4. QUESTION RENDER LOGIC
-    // ==========================================
-    const qTitle = document.getElementById('question-title');
-    const optionsContainer = document.getElementById('options-container');
-    const progressText = document.getElementById('quiz-progress-text');
-    const badgeDiff = document.getElementById('quiz-badge-diff');
-    const progressBar = document.getElementById('quiz-progress-bar');
-    const counterText = document.getElementById('answers-counter');
-
-    const btnPrev = document.getElementById('btn-prev-q');
-    const btnNext = document.getElementById('btn-next-q');
-    const questionCard = document.getElementById('question-card');
-    const finishCard = document.getElementById('quiz-finish-card');
-
-    function renderQuestion() {
-      const q = questions[currentQuestionIndex];
-
-      progressText.textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
-      const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
-      progressBar.style.width = `${progressPercent}%`;
-
-      badgeDiff.textContent = q.diff;
-      if (q.diff === 'Básico') {
-        badgeDiff.className = 'px-2.5 py-0.5 rounded-full text-xs font-mono bg-[#2f6fc4]/20 text-[#2f6fc4] border border-[#2f6fc4]/40 font-bold';
-      } else if (q.diff === 'Intermedio') {
-        badgeDiff.className = 'px-2.5 py-0.5 rounded-full text-xs font-mono bg-[#7ac143]/20 text-[#7ac143] border border-[#7ac143]/40 font-bold';
-      } else {
-        badgeDiff.className = 'px-2.5 py-0.5 rounded-full text-xs font-mono bg-[#e8672a]/20 text-[#e8672a] border border-[#e8672a]/40 font-bold';
-      }
-
-      qTitle.textContent = q.title;
-
-      optionsContainer.innerHTML = '';
-      q.options.forEach((optText, optIdx) => {
-        const isSelected = userAnswers[q.id] === optIdx;
-
-        const optBtn = document.createElement('button');
-        optBtn.type = 'button';
-        optBtn.className = `w-full text-left p-4 rounded-xl border text-sm transition-all duration-200 flex items-center justify-between cursor-pointer ${
-          isSelected
-            ? 'bg-[#2f6fc4]/20 border-[#2f6fc4] text-white font-medium ring-2 ring-[#2f6fc4]/40'
-            : 'bg-slate-900/50 border-slate-800 text-slate-300 hover:bg-slate-800/80 hover:border-slate-700'
+        item.className = `h-8 rounded-lg text-xs font-bold transition flex items-center justify-center border ${
+          isCurrent ? 'ring-2 ring-sky-400 border-sky-400' : ''
+        } ${
+          isLocked ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' : isAnswered ? 'bg-sky-950/60 text-sky-400 border-sky-800' : 'bg-slate-950 text-slate-500 border-slate-800'
         }`;
-
-        optBtn.innerHTML = `
-          <span>${optText}</span>
-          <span class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ml-3 ${
-            isSelected ? 'border-[#2f6fc4] bg-[#2f6fc4] text-white' : 'border-slate-600'
-          }">
-            ${isSelected ? '✓' : ''}
-          </span>
-        `;
-
-        optBtn.addEventListener('click', () => {
-          userAnswers[q.id] = optIdx;
-          saveAnswers();
+        item.innerText = idx + 1;
+        item.onclick = () => {
+          if (userAnswers[currentIdx] !== undefined) lockedQuestions[currentIdx] = true;
+          currentIdx = idx;
+          saveLocalStorage();
           renderQuestion();
-          updateCounter();
+        };
+        mapContainer.appendChild(item);
+      });
+    }
+
+    // MODAL DE DATOS DEL ALUMNO
+    function openStudentModal() {
+      if (userAnswers[currentIdx] !== undefined) lockedQuestions[currentIdx] = true;
+      document.getElementById('studentModal').classList.remove('hidden');
+    }
+
+    function closeStudentModal() {
+      document.getElementById('studentModal').classList.add('hidden');
+    }
+
+    // ENVÍO DEL EXAMEN Y EMAIL
+    function submitExamAndSendEmail(e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('btnConfirmSend');
+      btn.disabled = true;
+      btn.innerText = "Enviando Examen...";
+
+      // Cálculo del Resultado
+      let correctCount = 0;
+      questions.forEach((q, idx) => {
+        if (userAnswers[idx] === q.correct) correctCount++;
+      });
+
+      const score = ((correctCount / questions.length) * 10).toFixed(2);
+      const studentName = document.getElementById('studentName').value;
+      const studentDni = document.getElementById('studentDni').value;
+      const studentYear = document.getElementById('studentYear').value;
+      const studentCareer = document.getElementById('studentCareer').value;
+      const teacherEmail = document.getElementById('teacherEmail').value;
+
+      setTimeout(() => {
+        alert(`¡EVALUACIÓN COMPLETADA CON ÉXITO!\n\nAlumno: ${studentName}\nDNI: ${studentDni}\nCarrera: ${studentCareer}\nCalificación Final: ${score} / 10\n\nEl reporte de examen ha sido despachado a la casilla docente: ${teacherEmail}`);
+        localStorage.clear();
+        window.location.reload();
+      }, 1200);
+    }
+
+    // LOCAL STORAGE MANAGEMENT
+    function saveLocalStorage() {
+      const data = { currentIdx, userAnswers, lockedQuestions, hintsUsed, hintsLeft, timerSeconds, incidentsCount };
+      localStorage.setItem('ispi_exam_state', JSON.stringify(data));
+    }
+
+    function loadLocalStorage() {
+      const saved = localStorage.getItem('ispi_exam_state');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          currentIdx = parsed.currentIdx || 0;
+          userAnswers = parsed.userAnswers || {};
+          lockedQuestions = parsed.lockedQuestions || {};
+          hintsUsed = parsed.hintsUsed || {};
+          hintsLeft = parsed.hintsLeft !== undefined ? parsed.hintsLeft : 3;
+          timerSeconds = parsed.timerSeconds || 0;
+          incidentsCount = parsed.incidentsCount || 0;
+          document.getElementById('hintsLeftDisplay').innerText = `${hintsLeft} DISPONIBLES`;
+        } catch(e) {}
+      }
+    }
+
+    // CANVAS ANIMADO (RED DE NODOS Y CÓDIGO)
+    function initCanvas() {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      window.onresize = () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      };
+
+      const particles = Array.from({ length: 55 }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4
+      }));
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#0284c7';
+        ctx.strokeStyle = 'rgba(2, 132, 199, 0.12)';
+
+        particles.forEach((p, i) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > width) p.vx *= -1;
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
         });
 
-        optionsContainer.appendChild(optBtn);
-      });
-
-      btnPrev.disabled = currentQuestionIndex === 0;
-
-      if (currentQuestionIndex === questions.length - 1) {
-        btnNext.textContent = 'Finalizar Examen';
-        btnNext.className = 'px-6 py-2.5 rounded-xl bg-[#7ac143] hover:bg-[#8bd053] text-white font-bold text-sm transition-all shadow-md shadow-[#7ac143]/20 border border-[#7ac143]/40';
-      } else {
-        btnNext.textContent = 'Siguiente →';
-        btnNext.className = 'px-6 py-2.5 rounded-xl bg-[#2f6fc4] hover:bg-[#3d7ed2] text-white font-bold text-sm transition-all shadow-md shadow-[#2f6fc4]/20 border border-[#2f6fc4]/40';
+        requestAnimationFrame(animate);
       }
-
-      updateCounter();
+      animate();
     }
-
-    function updateCounter() {
-      const count = Object.keys(userAnswers).length;
-      counterText.textContent = `${count}/${questions.length} Respondidas`;
-    }
-
-    btnPrev.addEventListener('click', () => {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        renderQuestion();
-      }
-    });
-
-    btnNext.addEventListener('click', () => {
-      if (currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
-        renderQuestion();
-      } else {
-        questionCard.classList.add('hidden');
-        finishCard.classList.remove('hidden');
-        document.getElementById('final-total-count').textContent = `${Object.keys(userAnswers).length} / ${questions.length}`;
-      }
-    });
-
-    document.getElementById('btn-restart-quiz').addEventListener('click', () => {
-      if (confirm('¿Está seguro de reiniciar la evaluación? Se borrarán sus respuestas guardadas.')) {
-        userAnswers = {};
-        sessionStorage.removeItem('ispi_quiz_answers');
-        currentQuestionIndex = 0;
-        finishCard.classList.add('hidden');
-        questionCard.classList.remove('hidden');
-        renderQuestion();
-      }
-    });
-
-    // ==========================================
-    // 5. REPORT GENERATOR
-    // ==========================================
-    document.getElementById('btn-download-txt').addEventListener('click', () => {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('es-AR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-
-      let reportText = `==========================================================\n`;
-      reportText += `   ISPI 4019 SAN JUAN BAUTISTA · EVALUACIÓN DE REDES\n`;
-      reportText += `   Tecnicatura Superior en Soporte de Infraestructura TI\n`;
-      reportText += `==========================================================\n\n`;
-      reportText += `Fecha de Entrega : ${dateStr}\n`;
-      reportText += `Total Preguntas  : ${questions.length}\n`;
-      reportText += `Respondidas      : ${Object.keys(userAnswers).length}\n`;
-      reportText += `Estado           : COMPLETADO PARA REVISIÓN DOCENTE\n\n`;
-      reportText += `----------------------------------------------------------\n`;
-      reportText += `DETALLE DE RESPUESTAS REGISTRADAS:\n`;
-      reportText += `----------------------------------------------------------\n\n`;
-
-      questions.forEach((q) => {
-        const selectedIdx = userAnswers[q.id];
-        const selectedText = selectedIdx !== undefined ? q.options[selectedIdx] : 'SIN RESPONDER';
-
-        reportText += `[Pregunta ${q.id}] (${q.diff})\n`;
-        reportText += `Enunciado: ${q.title}\n`;
-        reportText += `Respuesta Marcada: ${selectedText}\n\n`;
-      });
-
-      reportText += `==========================================================\n`;
-      reportText += `HASH DE FIRMA DIGITAL: ISPI4019-${Math.random().toString(36).substring(2, 10).toUpperCase()}-${Date.now()}\n`;
-      reportText += `==========================================================\n`;
-
-      const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ISPI4019_Evaluacion_Redes_${now.toISOString().slice(0,10)}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-
   </script>
 </body>
 </html>
