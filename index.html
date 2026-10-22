@@ -28,7 +28,6 @@
       background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                         linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     }
-    /* Estilo para prevenir selección no autorizada */
     .no-select {
       -webkit-user-select: none;
       -moz-user-select: none;
@@ -96,7 +95,7 @@
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="relative bg-white p-1 rounded-lg border border-slate-700 shadow-md flex items-center justify-center">
-          <img src="logo-ispi.png" alt="ISPI 4019 Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='https://placehold.co/180x60/0284c7/ffffff?text=ISPI+4019'">
+          <img src="logo-ispi.png" alt="ISPI 4019 Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='img/logo-ispi.png'">
         </div>
         <div>
           <h1 class="text-base font-bold text-white tracking-wide">ISPI 4019</h1>
@@ -134,7 +133,7 @@
         <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-xs border border-indigo-500/20">L1</div>
         <div>
           <div class="text-xs font-bold text-white">Capa Física</div>
-          <div class="text-[10px] text-slate-400">Medios, Señalización, CSMA/CD</div>
+          <div class="text-[10px] text-slate-400">NIC, Repetidores, Medios</div>
         </div>
       </div>
 
@@ -143,7 +142,7 @@
         <div class="w-10 h-10 bg-sky-500/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-xs border border-sky-500/20">L2</div>
         <div>
           <div class="text-xs font-bold text-white">Capa Enlace</div>
-          <div class="text-[10px] text-slate-400">Switches, 802.1Q, STP BPDUs</div>
+          <div class="text-[10px] text-slate-400">Switches, CAM Table, VLANs</div>
         </div>
       </div>
 
@@ -152,7 +151,7 @@
         <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-xs border border-emerald-500/20">L3</div>
         <div>
           <div class="text-xs font-bold text-white">Capa Red</div>
-          <div class="text-[10px] text-slate-400">Subnetting CIDR, NAT/PAT, ARP</div>
+          <div class="text-[10px] text-slate-400">Routers, NAT, Subnetting</div>
         </div>
       </div>
 
@@ -161,14 +160,14 @@
         <div class="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-xs border border-rose-500/20">L4</div>
         <div>
           <div class="text-xs font-bold text-white">Seguridad & Servicios</div>
-          <div class="text-[10px] text-slate-400">Stateful Firewalls, WPA3 SAE, Ports</div>
+          <div class="text-[10px] text-slate-400">Firewall, Access Points, DNS</div>
         </div>
       </div>
 
       <!-- MAPA DE PREGUNTAS -->
       <div class="mt-6 pt-4 border-t border-slate-800/80">
         <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Matriz de Consignas</h3>
-        <div id="questionMap" class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2"></div>
+        <div id="questionMap" class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-3 gap-2"></div>
       </div>
     </section>
 
@@ -179,7 +178,7 @@
         <!-- HEADER DE PREGUNTA -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
           <span id="levelBadge" class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/30 rounded-full text-xs font-bold">Capa 1</span>
-          <span id="questionCounter" class="text-xs text-slate-400 font-mono">Pregunta 1 de 12</span>
+          <span id="questionCounter" class="text-xs text-slate-400 font-mono">Pregunta 1 de 9</span>
         </div>
 
         <h3 id="questionText" class="text-base sm:text-lg font-medium text-slate-100 mb-6 leading-relaxed">
@@ -253,170 +252,131 @@
 
   <!-- SCRIPT DE LÓGICA INTEGRAL -->
   <script>
-    // === BANCO DE PREGUNTAS COMPLEJAS CON PREGUNTAS TRAMPA ===
+    // === BANCO DE PREGUNTAS (CONCEPTOS BÁSICOS CON OPCIONES TRAMPA) ===
     const questions = [
-      // LAYER 1: FISICA
+      // NIVEL 1 - CAPA FÍSICA
       {
         id: 1,
         level: "Nivel 1 - Capa Física",
-        q: "En una red Ethernet Half-Duplex que utiliza el algoritmo CSMA/CD, ¿qué ocurre exactamente de manera inmediata después de que dos estaciones detectan una colisión eléctrica?",
+        q: "¿Cuál es la función esencial de una tarjeta de interfaz de red (NIC)?",
         options: [
-          "Ambas estaciones envían una señal de 'Jam' (mermelada) de 32 bits y detienen sus transmisiones por un tiempo fijo.",
-          "Ambas estaciones envían una señal de 'Jam', incrementan el contador de reintentos y ejecutan el algoritmo de tiempo de espera aleatorio (Truncated Binary Exponential Backoff).",
-          "El Switch conmuta la interfaz a Full-Duplex dinámicamente y reenvía los paquetes colisionados.",
-          "Se descarta la trama actual, se envía un mensaje ICMP Source Quench y la transmisión se reinicia inmediatamente sin demora."
+          "Asignar automáticamente una dirección IP pública al equipo cliente",
+          "Convertir los datos binarios del equipo en señales físicas aptas para el medio de transmisión",
+          "Filtrar virus e inspeccionar el contenido de los paquetes transmitidos",
+          "Determinar la ruta más rápida hacia un servidor en Internet"
         ],
         correct: 1,
-        hint: "La señal de Jam garantiza que los demás nodos noten la colisión, pero el tiempo de espera no es fijo, sino exponencialmente aleatorio."
+        hint: "La NIC trabaja convirtiendo bits en impulsos eléctricos, de luz o radiofrecuencia para viajar por el cable o aire."
       },
       {
         id: 2,
         level: "Nivel 1 - Capa Física",
-        q: "Al conectar un puerto de consola RJ45 de un Router Cisco a un puerto USB de una PC mediante un cable de consola (Rollover / Transpuesto), ¿cuál es la disposición correcta del orden del patillaje en ambos extremos?",
+        q: "Un repetidor o amplificador de señal actúa únicamente en la Capa 1 del modelo OSI porque:",
         options: [
-          "Extremo A (T568A) a Extremo B (T568B).",
-          "Los pines del extremo 1 al 8 se invierten totalmente en el extremo opuesto del 8 al 1.",
-          "Se cruzan únicamente los pares de transmisión (1-3) y recepción (2-6).",
-          "Los pines 4 y 5 se cortocircuitan para actuar como bucle de prueba (Loopback)."
+          "Solo analiza la dirección MAC de origen para saber hacia dónde enviar la señal",
+          "Regenera y retemporiza los impulsos físicos sin interpretar direcciones ni contenidos de tramas",
+          "Utiliza tablas de enrutamiento simplificadas para evitar la saturación de la red",
+          "Cifra los paquetes para que no sean interceptados durante el trayecto"
         ],
         correct: 1,
-        hint: "El cable Rollover es una inversión pin a pin exacta (1-8, 2-7, 3-6, 4-5, etc.)."
+        hint: "No lee tramas ni paquetes; trata todo el tráfico como una secuencia ciega de impulsos."
       },
       {
         id: 3,
         level: "Nivel 1 - Capa Física",
-        q: "¿Cuál de las siguientes afirmaciones sobre los transceptores SFP de Fibra Óptica Monomodo (SMF) e Multimodo (MMF) es CORRECTA y técnicamente precisa?",
+        q: "¿Qué ventaja crítica ofrece el cableado de Fibra Óptica frente al cable UTP de cobre tradicional?",
         options: [
-          "La fibra Multimodo utiliza un núcleo más delgado (~9 micrones) y luz láser para lograr mayores distancias que la Monomodo.",
-          "La fibra Monomodo utiliza un núcleo más ancho (~62.5 micrones) y un LED como fuente luminosa para evitar la dispersión modal.",
-          "La fibra Monomodo permite un único modo de propagación de la luz mediante un núcleo estrecho (~9 micrones), eliminando la dispersión modal y alcanzando mayores distancias.",
-          "Ambos tipos de fibra transmiten con exactamente las mismas longitudes de onda (850nm) sin importar el tipo de módulo SFP montado."
+          "Es inmune a la interferencia electromagnética (EMI) al transmitir fotones de luz",
+          "Asigna direcciones IP a mayor velocidad en distancias cortas",
+          "No requiere el uso de switches ni routers para conectar dispositivos",
+          "Aumenta automáticamente la velocidad de descarga contratada con el ISP"
         ],
-        correct: 2,
-        hint: "El núcleo delgado de la fibra Monomodo permite que la luz viaje por un único camino sin rebotar en múltiples ángulos."
+        correct: 0,
+        hint: "El cobre conduce electrones susceptibles al ruido magnético; la luz no se ve afectada por ello."
       },
 
-      // LAYER 2: ENLACE
+      // NIVEL 2 - CAPA ENLACE
       {
         id: 4,
         level: "Nivel 2 - Capa Enlace",
-        q: "En una línea troncal (Trunk) 802.1Q entre dos switches, ¿qué sucede con las tramas pertenecientes a la VLAN Nativa cuando atraviesan el enlace?",
+        q: "¿Cómo construye un Switch de Capa 2 su tabla de direcciones (CAM table)?",
         options: [
-          "Son etiquetadas con un Tag 802.1Q con ID=0 de manera obligatoria.",
-          "Se encapsulan mediante protocolo ISL (Inter-Switch Link) de Cisco.",
-          "Se transmiten sin etiqueta (Untagged); si el switch receptor recibe una trama sin etiqueta en un puerto troncal, la asigna automáticamente a su propia VLAN Nativa configurada.",
-          "Son descartadas por seguridad si no poseen la firma digital de la dirección MAC de origen."
+          "Consultando las direcciones IP de destino guardadas en el paquete",
+          "Examinando la dirección MAC de origen registrada en las tramas que ingresan por sus puertos",
+          "Solicitando la lista de equipos conectados directamente al servidor DNS central",
+          "Enviando un ping de broadcast a todas las interfaces en cada minuto"
         ],
-        correct: 2,
-        hint: "802.1Q no agrega etiqueta a la VLAN nativa por defecto; la falta de etiqueta indica su pertenencia."
+        correct: 1,
+        hint: "El switch 'escucha' quién envía la trama para asociar esa dirección MAC física con el puerto correspondiente."
       },
       {
         id: 5,
         level: "Nivel 2 - Capa Enlace",
-        q: "Durante la convergencia de Spanning Tree Protocol (STP IEEE 802.1D), ¿cuál es el comportamiento de un puerto que se encuentra en estado 'Learning' (Aprendizaje)?",
+        q: "¿Cuál es el propósito fundamental de configurar VLANs en una infraestructura corporativa?",
         options: [
-          "Procesa BPDUs, no aprende direcciones MAC y reenvía tramas de datos del usuario.",
-          "Procesa BPDUs y aprende direcciones MAC ingresándolas en la tabla CAM, pero NO reenvía tramas de datos de usuario.",
-          "No procesa BPDUs, no aprende MACs y bloquea completamente el tráfico de red.",
-          "Reenvía tramas de datos pero ignora todas las BPDUs entrantes hasta pasar a Forwarding."
+          "Duplicar el ancho de banda del proveedor de internet en todos los puestos",
+          "Segmentar la red local en dominios de broadcast independientes por razones de seguridad y gestión",
+          "Eliminar la necesidad de utilizar un Router o Firewall en la organización",
+          "Transformar las direcciones MAC en direcciones IP públicas de manera automática"
         ],
         correct: 1,
-        hint: "En 'Learning', el puerto poblará su tabla CAM antes de reenviar tramas para evitar flooding masivo."
-      },
-      {
-        id: 6,
-        level: "Nivel 2 - Capa Enlace",
-        q: "El Host A necesita enviar un paquete IP al Host B en la misma subred LAN, pero desconoce la dirección MAC del Host B. ¿Qué secuencia exacta de tramas ARP/ICMP ocurre?",
-        options: [
-          "El Host A envía una Solicitud ARP Unicast al Switch; el Switch la envía por DNS al Host B.",
-          "El Host A envía una Solicitud ARP Broadcast (FF:FF:FF:FF:FF:FF) preguntando por la IP del Host B; el Host B responde con una Respuesta ARP Unicast dirigida a la MAC de A.",
-          "El Host A transmite un ICMP Echo Request en Multicast (224.0.0.1) para forzar la actualización de ARP.",
-          "El Router de la red intercepta la trama, consulta su tabla de enrutamiento y devuelve la MAC del Gateway."
-        ],
-        correct: 1,
-        hint: "La pregunta de búsqueda ARP viaja hacia todos (Broadcast), pero la respuesta se envía solo al interesado (Unicast)."
+        hint: "Aislar lógicamente sectores (ej. Administración, Alumnos) reduce el tráfico innecesario y mejora la seguridad."
       },
 
-      // LAYER 3: RED
+      // NIVEL 3 - CAPA RED
+      {
+        id: 6,
+        level: "Nivel 3 - Capa Red",
+        q: "A diferencia de un Switch, ¿en qué se basa un Router para tomar decisiones de reenvío?",
+        options: [
+          "En la dirección MAC del dispositivo emisor",
+          "En la dirección IP de destino y su correspondiente tabla de enrutamiento",
+          "En la cantidad de archivos compartidos en la red local",
+          "En la velocidad de la tarjeta de red del equipo cliente"
+        ],
+        correct: 1,
+        hint: "El router analiza la capa 3 (Red) observando la IP lógica del destinatario."
+      },
       {
         id: 7,
         level: "Nivel 3 - Capa Red",
-        q: "Un administrador asigna la dirección IP 192.168.10.67/28 a la interfaz de un servidor. ¿Cuál es la dirección de Broadcast de esta subred específica y cuántos hosts utilizables permite?",
+        q: "¿Qué problema resuelve la tecnología NAT (Network Address Translation) en una red LAN?",
         options: [
-          "Broadcast: 192.168.10.255 | Hosts utilizables: 254",
-          "Broadcast: 192.168.10.79 | Hosts utilizables: 14",
-          "Broadcast: 192.168.10.64 | Hosts utilizables: 16",
-          "Broadcast: 192.168.10.127 | Hosts utilizables: 30"
+          "Evita que se rompan los cables de red por exceso de tráfico",
+          "Permite que múltiples dispositivos con IP privada compartan una única IP pública para salir a Internet",
+          "Garantiza que nadie pueda conectarse a la red Wi-Fi sin contraseña",
+          "Aumenta la capacidad de almacenamiento de los servidores de la red"
         ],
         correct: 1,
-        hint: "Una máscara /28 tiene bloques de 16 IPs (256-240). La subred arranca en 64 y termina en 79."
+        hint: "Traducción de direcciones: conecta toda tu casa u oficina a Internet usando una sola dirección IP pública."
       },
+
+      // NIVEL 4 - SEGURIDAD Y SERVICIOS
       {
         id: 8,
-        level: "Nivel 3 - Capa Red",
-        q: "Un Router recibe un paquete con IP destino 10.1.5.50. Su tabla de enrutamiento contiene las siguientes cuatro rutas. ¿Cuál utilizará para reenviar el paquete (Regla de la Coincidencia Más Larga / Longest Prefix Match)?",
+        level: "Nivel 4 - Seguridad & Servicios",
+        q: "¿Cuál es la función principal de un Firewall con inspección de estado (Stateful)?",
         options: [
-          "10.0.0.0/8 a través de Next-Hop 192.168.1.1",
-          "10.1.0.0/16 a través de Next-Hop 192.168.1.2",
-          "10.1.5.0/24 a través de Next-Hop 192.168.1.3",
-          "10.1.5.32/28 a través de Next-Hop 192.168.1.4"
+          "Aumentar la velocidad del Wi-Fi en zonas alejadas",
+          "Filtrar y bloquear el tráfico entrante o saliente analizando si pertenece a una conexión legítima y permitida",
+          "Asignar direcciones IP a las computadoras que se encienden por primera vez",
+          "Guardar copias de seguridad de todos los documentos transmitidos"
         ],
-        correct: 3,
-        hint: "El router siempre prefiere la ruta con la máscara de subred más específica (prefijo más largo) que contenga la IP destino."
+        correct: 1,
+        hint: "Actúa como un guardia de seguridad que verifica si el paquete entrante fue solicitado desde la red interna."
       },
       {
         id: 9,
-        level: "Nivel 3 - Capa Red",
-        q: "¿Cuál es la diferencia fundamental entre NAT Estático y PAT (Port Address Translation / NAT Overload)?",
-        options: [
-          "NAT Estático se utiliza únicamente para el tráfico saliente de clientes; PAT solo funciona para IPv6.",
-          "NAT Estático mapea una IP privada a una IP pública de forma 1 a 1; PAT mapea múltiples IPs privadas a una sola IP pública utilizando puertos efímeros de origen L4.",
-          "PAT altera la dirección MAC de la trama; NAT Estático modifica únicamente la máscara CIDR.",
-          "NAT Estático trabaja en Capa 4 examinando TCP Syn; PAT trabaja exclusivamente en Capa 2."
-        ],
-        correct: 1,
-        hint: "PAT permite la multiplexación de múltiples conexiones hacia una sola IP pública apoyándose en los números de puerto."
-      },
-
-      // LAYER 4: SEGURIDAD Y SERVICIOS
-      {
-        id: 10,
         level: "Nivel 4 - Seguridad & Servicios",
-        q: "¿Por qué un Firewall con Inspección de Estado (Stateful) es superior a un filtro de paquetes básico por Listas de Acceso (ACLs sin estado)?",
+        q: "Un Access Point (AP) empresarial configurado en modo Infraestructura cumple el rol de:",
         options: [
-          "Porque el Firewall Stateful descifra automáticamente todo el tráfico HTTPS sin requerir certificados.",
-          "Porque mantiene una tabla de estado de conexiones activas y permite el tráfico de retorno legítimo de forma dinámica sin abrir puertos fijos permanentes.",
-          "Porque analiza el código fuente de las aplicaciones en busca de malware directamente en la Capa Física.",
-          "Porque sustituye por completo la necesidad de routers y switches en la arquitectura corporativa."
+          "Reemplazar completamente el trabajo de un Servidor de Correos",
+          "Conectar dispositivos inalámbricos (Wi-Fi) a la red cableada de la organización",
+          "Generar direcciones IP públicas para cada teléfono celular conectado",
+          "Duplicar el espacio en disco rígido de las computadoras conectadas"
         ],
         correct: 1,
-        hint: "Al recordar quién inició la conexión saliente, el cortafuegos deja pasar las respuestas entrantes vinculadas automáticamente."
-      },
-      {
-        id: 11,
-        level: "Nivel 4 - Seguridad & Servicios",
-        q: "¿Qué mejora clave introduce WPA3-Personal para mitigar los ataques de diccionario fuera de línea (Offline Dictionary Attacks) en comparación con el Handshake de 4 vías de WPA2?",
-        options: [
-          "Reemplaza las contraseñas alfanuméricas por firmas biométricas obligatorias.",
-          "Reemplaza el protocolo PSK por el intercambio de claves SAE (Simultaneous Authentication of Equals) basado en el compromiso de Diffie-Hellman.",
-          "Obliga a que todos los dispositivos utilicen direcciones MAC aleatorias cada 60 segundos.",
-          "Elimina el cifrado AES-CCMP y obliga el uso de rotación manual de claves WEP."
-        ],
-        correct: 1,
-        hint: "SAE (Dragonfly Handshake) evita que un atacante capture la negociación inicial y pruebe millones de claves de su propio equipo."
-      },
-      {
-        id: 12,
-        level: "Nivel 4 - Seguridad & Servicios",
-        q: "Un cliente envía una consulta DNS para resolver un dominio y recibe una respuesta. ¿Qué números de puerto TCP/UDP y roles de transporte se utilizan típicamente en esta interacción cliente-servidor?",
-        options: [
-          "Cliente: Puerto Destino 80 / Servidor: Puerto Origen 80 (TCP)",
-          "Cliente: Puerto Origen efímero (>1024) / Servidor DNS: Puerto Destino 53 (UDP por defecto)",
-          "Cliente: Puerto Destino 443 / Servidor: Puerto Origen 53 (ICMP)",
-          "Cliente: Puerto 21 / Servidor: Puerto 22 (SSH Encapsulado)"
-        ],
-        correct: 1,
-        hint: "El cliente elige un puerto aleatorio alto en su equipo y realiza la consulta corta al puerto estándar de DNS 53."
+        hint: "Es un puente entre el medio inalámbrico (radiofrecuencia) y el medio cableado (Ethernet)."
       }
     ];
 
@@ -440,7 +400,7 @@
       setupSecurityListeners();
     };
 
-    // CONFIGURACIÓN DE LISTANERS DE SEGURIDAD STRICT KIOSK
+    // CONFIGURACIÓN DE LISTENERS DE SEGURIDAD STRICT KIOSK
     function setupSecurityListeners() {
       // Detección de cambio en Pantalla Completa
       document.addEventListener("fullscreenchange", handleSecurityCheck);
@@ -449,12 +409,12 @@
 
       // Detección de pérdida de foco o cambio de pestaña
       window.addEventListener("blur", () => {
-        if (examActive) triggerSecurityViolation("Pérdida de Foco / Cambio de Ventana");
+        if (examActive) triggerSecurityViolation();
       });
 
       document.addEventListener("visibilitychange", () => {
         if (document.hidden && examActive) {
-          triggerSecurityViolation("Cambio de Pestaña / Navegador Oculto");
+          triggerSecurityViolation();
         }
       });
     }
@@ -462,11 +422,11 @@
     function handleSecurityCheck() {
       const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
       if (!isFullscreen && examActive) {
-        triggerSecurityViolation("Salida de Pantalla Completa");
+        triggerSecurityViolation();
       }
     }
 
-    function triggerSecurityViolation(reason) {
+    function triggerSecurityViolation() {
       incidentsCount++;
       document.getElementById('incidentsHeaderDisplay').innerText = incidentsCount;
       document.getElementById('lockIncidentCounter').innerText = incidentsCount;
@@ -572,14 +532,14 @@
       renderQuestion();
     }
 
-    // NAVEGACIÓN Y BLOQUEO DE RESPUESTA DADO EL AVANZE
+    // NAVEGACIÓN Y BLOQUEO DE RESPUESTA DADO EL AVANCE
     function navigateQuestion(dir) {
       if (dir > 0) {
         if (userAnswers[currentIdx] === undefined) {
           alert("Por favor selecciona una opción antes de confirmar y continuar.");
           return;
         }
-        // Bloqueo de respuesta
+        // Bloqueo definitivo de respuesta
         lockedQuestions[currentIdx] = true;
       }
       currentIdx += dir;
