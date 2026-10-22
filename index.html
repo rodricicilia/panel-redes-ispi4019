@@ -28,6 +28,7 @@
       background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
                         linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
     }
+    /* Estilo para prevenir selección no autorizada */
     .no-select {
       -webkit-user-select: none;
       -moz-user-select: none;
@@ -56,8 +57,8 @@
       <div class="text-slate-300 text-xs text-left bg-slate-950/80 p-4 rounded-xl border border-slate-800/80 space-y-2 mb-6 leading-relaxed">
         <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Pantalla Completa Obligatoria:</strong> Al iniciar, se forzará el modo Kiosk. Exigirá mantenerse en la ventana actual.</span></p>
         <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Detección de Interrupciones:</strong> Minimizar, cambiar de pestaña, salir de pantalla completa o perder el foco bloqueará el examen automáticamente.</span></p>
+        <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Progreso Estricto Secuencial:</strong> Debes responder en orden. No se puede elegir el nivel de inicio ni volver a preguntas confirmadas.</span></p>
         <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Registro de Incidencias:</strong> Cada interrupción incrementará la métrica de infracciones que recibirá el docente.</span></p>
-        <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Respuestas Definitivas:</strong> Al confirmar y avanzar de pregunta, la respuesta quedará bloqueada sin posibilidad de edición.</span></p>
       </div>
 
       <button id="btnStartExam" onclick="startExamInKiosk()" class="w-full py-4 px-6 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-900/40 transition transform active:scale-95 flex items-center justify-center gap-2 text-sm tracking-wide">
@@ -95,7 +96,7 @@
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="relative bg-white p-1 rounded-lg border border-slate-700 shadow-md flex items-center justify-center">
-          <img src="logo-ispi.png" alt="ISPI 4019 Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='img/logo-ispi.png'">
+          <img src="logo-ispi.png" alt="ISPI 4019 Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='https://placehold.co/180x60/0284c7/ffffff?text=ISPI+4019'">
         </div>
         <div>
           <h1 class="text-base font-bold text-white tracking-wide">ISPI 4019</h1>
@@ -129,45 +130,45 @@
       <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Capas de Evaluación</h2>
       
       <!-- LAYER 1 -->
-      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
+      <div id="layerCard1" class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3 transition">
         <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-xs border border-indigo-500/20">L1</div>
         <div>
-          <div class="text-xs font-bold text-white">Capa Física</div>
-          <div class="text-[10px] text-slate-400">NIC, Repetidores, Medios</div>
+          <div class="text-xs font-bold text-white">Nivel 1: Capa Física</div>
+          <div class="text-[10px] text-slate-400">4 Preguntas (P1 a P4)</div>
         </div>
       </div>
 
       <!-- LAYER 2 -->
-      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
+      <div id="layerCard2" class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3 transition">
         <div class="w-10 h-10 bg-sky-500/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-xs border border-sky-500/20">L2</div>
         <div>
-          <div class="text-xs font-bold text-white">Capa Enlace</div>
-          <div class="text-[10px] text-slate-400">Switches, CAM Table, VLANs</div>
+          <div class="text-xs font-bold text-white">Nivel 2: Capa Enlace</div>
+          <div class="text-[10px] text-slate-400">4 Preguntas (P5 a P8)</div>
         </div>
       </div>
 
       <!-- LAYER 3 -->
-      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
+      <div id="layerCard3" class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3 transition">
         <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-xs border border-emerald-500/20">L3</div>
         <div>
-          <div class="text-xs font-bold text-white">Capa Red</div>
-          <div class="text-[10px] text-slate-400">Routers, NAT, Subnetting</div>
+          <div class="text-xs font-bold text-white">Nivel 3: Capa Red</div>
+          <div class="text-[10px] text-slate-400">4 Preguntas (P9 a P12)</div>
         </div>
       </div>
 
       <!-- LAYER 4 -->
-      <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
+      <div id="layerCard4" class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3 transition">
         <div class="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-xs border border-rose-500/20">L4</div>
         <div>
-          <div class="text-xs font-bold text-white">Seguridad & Servicios</div>
-          <div class="text-[10px] text-slate-400">Firewall, Access Points, DNS</div>
+          <div class="text-xs font-bold text-white">Nivel 4: Servicios & Seguridad</div>
+          <div class="text-[10px] text-slate-400">4 Preguntas (P13 a P16)</div>
         </div>
       </div>
 
       <!-- MAPA DE PREGUNTAS -->
       <div class="mt-6 pt-4 border-t border-slate-800/80">
-        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Matriz de Consignas</h3>
-        <div id="questionMap" class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-3 gap-2"></div>
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Matriz de Consignas (16 Totales)</h3>
+        <div id="questionMap" class="grid grid-cols-4 sm:grid-cols-8 lg:grid-cols-4 gap-2"></div>
       </div>
     </section>
 
@@ -178,7 +179,7 @@
         <!-- HEADER DE PREGUNTA -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
           <span id="levelBadge" class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/30 rounded-full text-xs font-bold">Capa 1</span>
-          <span id="questionCounter" class="text-xs text-slate-400 font-mono">Pregunta 1 de 9</span>
+          <span id="questionCounter" class="text-xs text-slate-400 font-mono">Pregunta 1 de 16</span>
         </div>
 
         <h3 id="questionText" class="text-base sm:text-lg font-medium text-slate-100 mb-6 leading-relaxed">
@@ -199,7 +200,6 @@
         </button>
 
         <div class="flex gap-3">
-          <button id="btnPrev" onclick="navigateQuestion(-1)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition disabled:opacity-40">Anterior</button>
           <button id="btnNext" onclick="navigateQuestion(1)" class="px-6 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-sky-900/40">Confirmar y Avanzar</button>
           <button id="btnSubmitExam" onclick="openStudentModal()" class="hidden px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-900/40">Finalizar Examen</button>
         </div>
@@ -209,42 +209,46 @@
 
   </main>
 
-  <!-- MODAL OBLIGATORIO DE DATOS DEL ALUMNO Y ENVÍO DIRECTO AL PROFESOR -->
-  <div id="studentModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
-      <h3 class="text-xl font-bold text-white mb-1">Identificación del Estudiante</h3>
-      <p class="text-xs text-slate-400 mb-6">Ingresa tus datos personales oficiales para asociar esta evaluación. La entrega se transmitirá directamente al correo del docente.</p>
+  <!-- MODAL OBLIGATORIO DE DATOS DEL ALUMNO (INAMOVIBLE Y SIN POSIBILIDAD DE VOLVER ATRÁS) -->
+  <div id="studentModal" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+    <div class="max-w-lg w-full bg-slate-900 border-2 border-emerald-500/60 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-emerald-950/50">
+      <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-3 border border-emerald-500/40">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <h3 class="text-xl font-bold text-white text-center mb-1">Cuestionario Completado</h3>
+      <p class="text-xs text-slate-400 text-center mb-6">Ingresa tus datos oficiales para registrar la entrega. No es posible retornar al cuestionario.</p>
 
       <form id="studentForm" onsubmit="submitExamAndSendEmail(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Nombre y Apellido del Alumno *</label>
-          <input type="text" id="studentName" required placeholder="Ej. Juan Pérez" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+          <input type="text" id="studentName" required placeholder="Ej. Juan Pérez" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-1">DNI / Documento *</label>
-            <input type="text" id="studentDni" required placeholder="12345678" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+            <input type="text" id="studentDni" required placeholder="12345678" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-1">Año / Cátedra *</label>
-            <input type="text" id="studentYear" value="1er Año - ISPI 4019" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+            <input type="text" id="studentYear" value="1er Año - ISPI 4019" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
           </div>
         </div>
 
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Carrera *</label>
-          <input type="text" id="studentCareer" value="Tecnicatura Superior en Infraestructura de Redes" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+          <input type="text" id="studentCareer" value="Tecnicatura Superior en Infraestructura de Redes" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
         </div>
 
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico del Profesor *</label>
-          <input type="email" id="teacherEmail" placeholder="profesor@ispi4019.edu.ar" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+          <input type="email" id="teacherEmail" placeholder="profesor@ispi4019.edu.ar" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-emerald-500">
         </div>
 
-        <div class="pt-4 flex justify-end gap-3">
-          <button type="button" onclick="closeStudentModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Volver al Examen</button>
-          <button type="submit" id="btnConfirmSend" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-900/40">Enviar Reporte Directo</button>
+        <div class="pt-4">
+          <button type="submit" id="btnConfirmSend" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg shadow-emerald-900/40 transition">
+            Enviar Reporte Directo y Finalizar
+          </button>
         </div>
       </form>
     </div>
@@ -252,131 +256,222 @@
 
   <!-- SCRIPT DE LÓGICA INTEGRAL -->
   <script>
-    // === BANCO DE PREGUNTAS (CONCEPTOS BÁSICOS CON OPCIONES TRAMPA) ===
+    // === BANCO DE 16 PREGUNTAS (4 POR NIVEL) ===
     const questions = [
-      // NIVEL 1 - CAPA FÍSICA
+      // NIVEL 1: CAPA FÍSICA (P1 - P4)
       {
         id: 1,
         level: "Nivel 1 - Capa Física",
-        q: "¿Cuál es la función esencial de una tarjeta de interfaz de red (NIC)?",
+        q: "¿Cuál es la función principal de la Tarjeta de Interfaz de Red (NIC) en el nivel físico del modelo OSI?",
         options: [
-          "Asignar automáticamente una dirección IP pública al equipo cliente",
-          "Convertir los datos binarios del equipo en señales físicas aptas para el medio de transmisión",
-          "Filtrar virus e inspeccionar el contenido de los paquetes transmitidos",
-          "Determinar la ruta más rápida hacia un servidor en Internet"
+          "Convertir los datos binarios en señales eléctricas, ópticas o de radiofrecuencia apropiadas para el medio de transmisión.",
+          "Asignar direcciones IP dinámicas mediante el protocolo DHCP.",
+          "Determinar la mejor ruta para enviar paquetes entre redes distintas.",
+          "Establecer la tabla de conmutación MAC para filtrar tramas Ethernet."
         ],
-        correct: 1,
-        hint: "La NIC trabaja convirtiendo bits en impulsos eléctricos, de luz o radiofrecuencia para viajar por el cable o aire."
+        correct: 0,
+        hint: "La NIC física actúa en el nivel 1 transformando bits digitales en impulsos físicos para el medio cableado o inalámbrico."
       },
       {
         id: 2,
         level: "Nivel 1 - Capa Física",
-        q: "Un repetidor o amplificador de señal actúa únicamente en la Capa 1 del modelo OSI porque:",
+        q: "¿Qué dispositivo de Capa 1 se utiliza exclusivamente para regenerar y reamplificar una señal atenuada sin analizar su contenido ni direcciones?",
         options: [
-          "Solo analiza la dirección MAC de origen para saber hacia dónde enviar la señal",
-          "Regenera y retemporiza los impulsos físicos sin interpretar direcciones ni contenidos de tramas",
-          "Utiliza tablas de enrutamiento simplificadas para evitar la saturación de la red",
-          "Cifra los paquetes para que no sean interceptados durante el trayecto"
+          "Switch gestionable.",
+          "Repetidor / Amplificador.",
+          "Router de borde.",
+          "Servidor Proxy."
         ],
         correct: 1,
-        hint: "No lee tramas ni paquetes; trata todo el tráfico como una secuencia ciega de impulsos."
+        hint: "Este dispositivo opera puramente a nivel eléctrico u óptico, extendiendo la distancia física del cableado."
       },
       {
         id: 3,
         level: "Nivel 1 - Capa Física",
-        q: "¿Qué ventaja crítica ofrece el cableado de Fibra Óptica frente al cable UTP de cobre tradicional?",
+        q: "¿Cuál es la ventaja fundamental de utilizar Fibra Óptica frente a cables de Par Trenzado UTP en entornos industriales de alta densidad?",
         options: [
-          "Es inmune a la interferencia electromagnética (EMI) al transmitir fotones de luz",
-          "Asigna direcciones IP a mayor velocidad en distancias cortas",
-          "No requiere el uso de switches ni routers para conectar dispositivos",
-          "Aumenta automáticamente la velocidad de descarga contratada con el ISP"
-        ],
-        correct: 0,
-        hint: "El cobre conduce electrones susceptibles al ruido magnético; la luz no se ve afectada por ello."
-      },
-
-      // NIVEL 2 - CAPA ENLACE
-      {
-        id: 4,
-        level: "Nivel 2 - Capa Enlace",
-        q: "¿Cómo construye un Switch de Capa 2 su tabla de direcciones (CAM table)?",
-        options: [
-          "Consultando las direcciones IP de destino guardadas en el paquete",
-          "Examinando la dirección MAC de origen registrada en las tramas que ingresan por sus puertos",
-          "Solicitando la lista de equipos conectados directamente al servidor DNS central",
-          "Enviando un ping de broadcast a todas las interfaces en cada minuto"
+          "La fibra óptica transmite corriente continua de alto voltaje a los nodos.",
+          "La fibra es totalmente inmune a la interferencia electromagnética (EMI) y soporta mayores distancias sin atenuación crítica.",
+          "La fibra óptica no requiere módulos o transceptores para conectarse a un switch.",
+          "La fibra permite el uso directo de conectores RJ-45 estándar."
         ],
         correct: 1,
-        hint: "El switch 'escucha' quién envía la trama para asociar esa dirección MAC física con el puerto correspondiente."
+        hint: "Al transmitir pulsos de luz en lugar de señales eléctricas, los campos electromagnéticos de motores o transformadores no la afectan."
       },
+      {
+        id: 4,
+        level: "Nivel 1 - Capa Física",
+        q: "En una topología en Estrella física conectada mediante un concentrador (Hub) pasivo de Capa 1, ¿cómo se gestionan los dominios de colisión?",
+        options: [
+          "Cada puerto posee su propio dominio de colisión aislado en Full-Duplex.",
+          "Todos los puertos comparten un único dominio de colisión, retransmitiendo el flujo eléctrico por todos los demás puertos.",
+          "El Hub analiza las direcciones IP para evitar la colisión de paquetes.",
+          "El tráfico se conmuta mediante inspección de tramas 802.1Q."
+        ],
+        correct: 1,
+        hint: "Un Hub de capa 1 es una repetidora multipuerto eléctrica; si dos nodos transmiten al mismo tiempo, colisionan."
+      },
+
+      // NIVEL 2: CAPA ENLACE DE DATOS (P5 - P8)
       {
         id: 5,
         level: "Nivel 2 - Capa Enlace",
-        q: "¿Cuál es el propósito fundamental de configurar VLANs en una infraestructura corporativa?",
+        q: "¿De qué manera construye y actualiza un Switch de Capa 2 su tabla de direcciones MAC (Tabla CAM)?",
         options: [
-          "Duplicar el ancho de banda del proveedor de internet en todos los puestos",
-          "Segmentar la red local en dominios de broadcast independientes por razones de seguridad y gestión",
-          "Eliminar la necesidad de utilizar un Router o Firewall en la organización",
-          "Transformar las direcciones MAC en direcciones IP públicas de manera automática"
+          "Inspeccionando la dirección IP de origen en los encabezados ICMP.",
+          "Examinando la dirección MAC de origen de las tramas entrantes que ingresan por cada puerto físico.",
+          "Mediante consultas automatizadas al servidor DNS local.",
+          "Leyendo la dirección MAC de destino especificada en la tabla de enrutamiento."
         ],
         correct: 1,
-        hint: "Aislar lógicamente sectores (ej. Administración, Alumnos) reduce el tráfico innecesario y mejora la seguridad."
+        hint: "El switch aprende quién está en cada puerto observando de dónde vienen las tramas (MAC Origen)."
       },
-
-      // NIVEL 3 - CAPA RED
       {
         id: 6,
-        level: "Nivel 3 - Capa Red",
-        q: "A diferencia de un Switch, ¿en qué se basa un Router para tomar decisiones de reenvío?",
+        level: "Nivel 2 - Capa Enlace",
+        q: "¿Cuál es el propósito del etiquetado de tramas bajo el estándar IEEE 802.1Q en enlaces Troncales (Trunk)?",
         options: [
-          "En la dirección MAC del dispositivo emisor",
-          "En la dirección IP de destino y su correspondiente tabla de enrutamiento",
-          "En la cantidad de archivos compartidos en la red local",
-          "En la velocidad de la tarjeta de red del equipo cliente"
+          "Encriptar los paquetes mediante contraseñas WPA3.",
+          "Añadir un campo Header de 4 bytes que identifica la VLAN a la que pertenece la trama para multiplexar múltiples redes virtuales.",
+          "Traducir direcciones MAC privadas en direcciones públicas.",
+          "Bloquear el puerto en caso de detectar un bucle en el enrutamiento IP."
         ],
         correct: 1,
-        hint: "El router analiza la capa 3 (Red) observando la IP lógica del destinatario."
+        hint: "El tag 802.1Q inserta el VLAN ID dentro del encabezado Ethernet original."
       },
       {
         id: 7,
-        level: "Nivel 3 - Capa Red",
-        q: "¿Qué problema resuelve la tecnología NAT (Network Address Translation) en una red LAN?",
+        level: "Nivel 2 - Capa Enlace",
+        q: "Un Host A envía una solicitud ARP para averiguar la dirección MAC de un Host B en su misma subred. ¿De qué tipo es la trama de solicitud y cuál es su dirección MAC destino?",
         options: [
-          "Evita que se rompan los cables de red por exceso de tráfico",
-          "Permite que múltiples dispositivos con IP privada compartan una única IP pública para salir a Internet",
-          "Garantiza que nadie pueda conectarse a la red Wi-Fi sin contraseña",
-          "Aumenta la capacidad de almacenamiento de los servidores de la red"
+          "Es Unicast con dirección MAC destino 00:00:00:00:00:00.",
+          "Es Broadcast con dirección MAC destino FF:FF:FF:FF:FF:FF.",
+          "Es Multicast con dirección destino 224.0.0.1.",
+          "Es una trama cifrada dirigida al Gateway por defecto."
         ],
         correct: 1,
-        hint: "Traducción de direcciones: conecta toda tu casa u oficina a Internet usando una sola dirección IP pública."
+        hint: "Dado que el Host A ignora la MAC destino, debe preguntar a todos los equipos del segmento de difusión."
       },
-
-      // NIVEL 4 - SEGURIDAD Y SERVICIOS
       {
         id: 8,
-        level: "Nivel 4 - Seguridad & Servicios",
-        q: "¿Cuál es la función principal de un Firewall con inspección de estado (Stateful)?",
+        level: "Nivel 2 - Capa Enlace",
+        q: "Si un Switch de Capa 2 recibe una trama Unicast cuya dirección MAC de destino NO figura en su tabla CAM, ¿qué acción realiza por defecto?",
         options: [
-          "Aumentar la velocidad del Wi-Fi en zonas alejadas",
-          "Filtrar y bloquear el tráfico entrante o saliente analizando si pertenece a una conexión legítima y permitida",
-          "Asignar direcciones IP a las computadoras que se encienden por primera vez",
-          "Guardar copias de seguridad de todos los documentos transmitidos"
+          "Descarta la trama inmediatamente y envía una notificación de error.",
+          "Realiza una inundación (Flooding) reenviando la trama por todos los puertos activos excepto por el puerto por donde ingresó.",
+          "Envía un paquete ARP al router para que asigne la MAC faltante.",
+          "Bloquea el puerto de origen por posible vulnerabilidad de seguridad."
         ],
         correct: 1,
-        hint: "Actúa como un guardia de seguridad que verifica si el paquete entrante fue solicitado desde la red interna."
+        hint: "Se conoce como Unknown Unicast Flooding para asegurar que el destinatario la reciba si está conectado."
       },
+
+      // NIVEL 3: CAPA DE RED (P9 - P12)
       {
         id: 9,
-        level: "Nivel 4 - Seguridad & Servicios",
-        q: "Un Access Point (AP) empresarial configurado en modo Infraestructura cumple el rol de:",
+        level: "Nivel 3 - Capa Red",
+        q: "¿Cuál es la función operativa primordial de un Router dentro de una infraestructura de telecomunicaciones?",
         options: [
-          "Reemplazar completamente el trabajo de un Servidor de Correos",
-          "Conectar dispositivos inalámbricos (Wi-Fi) a la red cableada de la organización",
-          "Generar direcciones IP públicas para cada teléfono celular conectado",
-          "Duplicar el espacio en disco rígido de las computadoras conectadas"
+          "Asignar nombres de dominio legibles a las direcciones físicas de los clientes.",
+          "Interconectar redes lógicas distintas y reenviar paquetes basándose en su dirección IP de destino y tablas de enrutamiento.",
+          "Filtrar el ruido eléctrico en cables de par trenzado UTP.",
+          "Gestionar las colisiones en el segmento LAN local."
         ],
         correct: 1,
-        hint: "Es un puente entre el medio inalámbrico (radiofrecuencia) y el medio cableado (Ethernet)."
+        hint: "Los routers interconectan diferentes subredes lógicas en el nivel 3."
+      },
+      {
+        id: 10,
+        level: "Nivel 3 - Capa Red",
+        q: "¿Qué sucede con el campo TTL (Time to Live) de un paquete IPv4 cada vez que atraviesa un Router (Salto)?",
+        options: [
+          "El valor del TTL se incrementa en 1 unidad.",
+          "El valor del TTL se decrementa en 1 unidad; si llega a 0, el router descarta el paquete para prevenir bucles de enrutamiento infinitos.",
+          "Permanecerá inalterado durante todo el trayecto hasta el host destino.",
+          "Se convierte en una dirección MAC pública de salida."
+        ],
+        correct: 1,
+        hint: "El TTL evita que paquetes perdidos circulen eternamente en la red."
+      },
+      {
+        id: 11,
+        level: "Nivel 3 - Capa Red",
+        q: "Según el estándar RFC 1918, ¿cuál de los siguientes rangos corresponde a un bloque de Direcciones IP Privadas para redes internas?",
+        options: [
+          "8.8.8.0 / 24",
+          "172.16.0.0 a 172.31.255.255",
+          "200.44.10.0 / 16",
+          "1.1.1.1 a 1.0.0.1"
+        ],
+        correct: 1,
+        hint: "El RFC 1918 define tres rangos privados: 10.0.0.0/8, 172.16.0.0/12 y 192.168.0.0/16."
+      },
+      {
+        id: 12,
+        level: "Nivel 3 - Capa Red",
+        q: "¿Cuál es la función técnica de NAT (Network Address Translation) en un router de frontera?",
+        options: [
+          "Traducir solicitudes DNS en direcciones MAC de la red local.",
+          "Modificar la dirección IP contenida en los paquetes para permitir que direcciones IP privadas internas accedan a la red pública Internet.",
+          "Crear enlaces cifrados VLAN 802.1Q en redes corporativas.",
+          "Aumentar el ancho de banda del cableado físico."
+        ],
+        correct: 1,
+        hint: "NAT reescribe las cabeceras de red para permitir la reutilización de direcciones privadas en la red pública."
+      },
+
+      // NIVEL 4: SERVICIOS Y SEGURIDAD (P13 - P16)
+      {
+        id: 13,
+        level: "Nivel 4 - Servicios & Seguridad",
+        q: "¿Cómo diferencia un Firewall de Estado (Stateful) una conexión legítima entrante de un posible ataque externo?",
+        options: [
+          "Verificando el color del cable conectado a la interfaz WAN.",
+          "Manteniendo una tabla de estados que rastrea las conexiones salientes iniciadas por los clientes internos para permitir dinámicamente solo sus respuestas asociadas.",
+          "Cifrando la MAC de todos los dispositivos de la subred.",
+          "Requiriendo un reinicio diario de las tablas ARP."
+        ],
+        correct: 1,
+        hint: "Stateful 'recuerda' qué conexiones salieron para permitir las respuestas de vuelta sin exponer la red."
+      },
+      {
+        id: 14,
+        level: "Nivel 4 - Servicios & Seguridad",
+        q: "Un Punto de Acceso Inalámbrico (WAP) opera extendiendo la red de datos mediante radiofrecuencia. ¿Qué rol desempeña la clave de seguridad WPA2/WPA3 en la interfaz del cliente?",
+        options: [
+          "Asignar la mascara de subred IP al adaptador inalámbrico.",
+          "Autenticar la estación cliente y derivar las claves maestras de cifrado para proteger el tráfico de datos en el aire.",
+          "Definir la velocidad física del cable troncal conectado al AP.",
+          "Desactivar el protocolo Spanning Tree en la interfaz de radio."
+        ],
+        correct: 1,
+        hint: "La autenticación y cifrado a nivel de acceso evitan la interceptación de tramas por aire."
+      },
+      {
+        id: 15,
+        level: "Nivel 4 - Servicios & Seguridad",
+        q: "En una arquitectura de red, ¿qué protocolo de la capa de aplicación/servicios se encarga de resolver un nombre cualificado (ej. www.ispi4019.edu.ar) en una dirección IP utilizable?",
+        options: [
+          "DHCP",
+          "DNS",
+          "SNMP",
+          "FTP"
+        ],
+        correct: 1,
+        hint: "DNS actúa como el directorio de la red para traducir nombres legibles en IPs."
+      },
+      {
+        id: 16,
+        level: "Nivel 4 - Servicios & Seguridad",
+        q: "Cuando un cliente DHCP solicita los parámetros de red iniciales a un servidor, ¿cuáles son los 4 pasos secuenciales del proceso conocido como DORA?",
+        options: [
+          "Disconnect, Overload, Reset, Acknowledge",
+          "Discover, Offer, Request, Acknowledge",
+          "Domain, Option, Route, Access",
+          "Detect, Open, Receive, Allow"
+        ],
+        correct: 1,
+        hint: "El cliente Descubre, el servidor Ofrece, el cliente Solicita (Request) y el servidor Confirma (Acknowledge)."
       }
     ];
 
@@ -402,19 +497,17 @@
 
     // CONFIGURACIÓN DE LISTENERS DE SEGURIDAD STRICT KIOSK
     function setupSecurityListeners() {
-      // Detección de cambio en Pantalla Completa
       document.addEventListener("fullscreenchange", handleSecurityCheck);
       document.addEventListener("webkitfullscreenchange", handleSecurityCheck);
       document.addEventListener("mozfullscreenchange", handleSecurityCheck);
 
-      // Detección de pérdida de foco o cambio de pestaña
       window.addEventListener("blur", () => {
-        if (examActive) triggerSecurityViolation();
+        if (examActive) triggerSecurityViolation("Pérdida de Foco / Cambio de Ventana");
       });
 
       document.addEventListener("visibilitychange", () => {
         if (document.hidden && examActive) {
-          triggerSecurityViolation();
+          triggerSecurityViolation("Cambio de Pestaña / Navegador Oculto");
         }
       });
     }
@@ -422,11 +515,11 @@
     function handleSecurityCheck() {
       const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
       if (!isFullscreen && examActive) {
-        triggerSecurityViolation();
+        triggerSecurityViolation("Salida de Pantalla Completa");
       }
     }
 
-    function triggerSecurityViolation() {
+    function triggerSecurityViolation(reason) {
       incidentsCount++;
       document.getElementById('incidentsHeaderDisplay').innerText = incidentsCount;
       document.getElementById('lockIncidentCounter').innerText = incidentsCount;
@@ -463,6 +556,13 @@
           document.getElementById('timerDisplay').innerText = `${min}:${sec}`;
           saveLocalStorage();
         }, 1000);
+      }
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
       }
     }
 
@@ -511,8 +611,7 @@
       // Botón Pista
       document.getElementById('btnHint').disabled = hintsLeft <= 0 || hintsUsed[currentIdx] || isLocked;
 
-      // Navegación y Botón Finalizar
-      document.getElementById('btnPrev').disabled = currentIdx === 0;
+      // Mostrar exclusivamente botón de avanzar o finalizar en P16
       if (currentIdx === questions.length - 1) {
         document.getElementById('btnNext').classList.add('hidden');
         document.getElementById('btnSubmitExam').classList.remove('hidden');
@@ -532,14 +631,14 @@
       renderQuestion();
     }
 
-    // NAVEGACIÓN Y BLOQUEO DE RESPUESTA DADO EL AVANCE
+    // NAVEGACIÓN Y BLOQUEO DE RESPUESTA DADO EL AVANZE
     function navigateQuestion(dir) {
       if (dir > 0) {
         if (userAnswers[currentIdx] === undefined) {
           alert("Por favor selecciona una opción antes de confirmar y continuar.");
           return;
         }
-        // Bloqueo definitivo de respuesta
+        // Bloqueo definitivo de la pregunta actual
         lockedQuestions[currentIdx] = true;
       }
       currentIdx += dir;
@@ -558,44 +657,62 @@
       }
     }
 
-    // MATRIZ/MAPA DE PREGUNTAS
+    // MATRIZ/MAPA DE PREGUNTAS (INDICADOR SOLAMENTE - DESACTIVADO CLIC PARA MANTENER ORDEN SECUENCIAL)
     function renderMap() {
       const mapContainer = document.getElementById('questionMap');
       mapContainer.innerHTML = '';
       questions.forEach((_, idx) => {
-        const item = document.createElement('button');
+        const item = document.createElement('div');
         const isCurrent = idx === currentIdx;
         const isAnswered = userAnswers[idx] !== undefined;
         const isLocked = lockedQuestions[idx];
 
-        item.className = `h-9 rounded-lg text-xs font-bold transition flex items-center justify-center border ${
-          isCurrent ? 'ring-2 ring-sky-400 border-sky-400 text-white' : ''
+        item.className = `h-9 rounded-lg text-xs font-bold flex items-center justify-center border ${
+          isCurrent ? 'ring-2 ring-sky-400 border-sky-400 text-white bg-sky-900/40' : ''
         } ${
           isLocked 
             ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' 
             : isAnswered 
               ? 'bg-sky-950/60 text-sky-400 border-sky-800' 
-              : 'bg-slate-950 text-slate-500 border-slate-800'
+              : 'bg-slate-950 text-slate-600 border-slate-800/80'
         }`;
         item.innerText = idx + 1;
-        item.onclick = () => {
-          if (userAnswers[currentIdx] !== undefined) lockedQuestions[currentIdx] = true;
-          currentIdx = idx;
-          saveLocalStorage();
-          renderQuestion();
-        };
         mapContainer.appendChild(item);
       });
     }
 
-    // ABRIR MODAL DEL ESTUDIANTE
+    // ABRIR MODAL DEL ESTUDIANTE (SIN OPCIÓN DE REGRESO)
     function openStudentModal() {
-      if (userAnswers[currentIdx] !== undefined) lockedQuestions[currentIdx] = true;
+      if (userAnswers[currentIdx] === undefined) {
+        alert("Debes responder la última consigna antes de finalizar el examen.");
+        return;
+      }
+      lockedQuestions[currentIdx] = true;
+      saveLocalStorage();
+      stopTimer(); // Se congela el tiempo de la prueba
       document.getElementById('studentModal').classList.remove('hidden');
     }
 
-    function closeStudentModal() {
-      document.getElementById('studentModal').classList.add('hidden');
+    // RESETEAR TODO EL ESTADO DEL EXAMEN TRAS COMPLETAR
+    function resetFullExamState() {
+      stopTimer();
+      currentIdx = 0;
+      userAnswers = {};
+      lockedQuestions = {};
+      hintsUsed = {};
+      hintsLeft = 3;
+      timerSeconds = 0;
+      incidentsCount = 0;
+      examActive = false;
+
+      // Limpieza de almacenamiento local
+      localStorage.removeItem('ispi_exam_state_v2');
+
+      // Actualizar contadores en interfaz
+      document.getElementById('timerDisplay').innerText = '00:00';
+      document.getElementById('hintsLeftDisplay').innerText = '3 DISPONIBLES';
+      document.getElementById('incidentsHeaderDisplay').innerText = '0';
+      document.getElementById('lockIncidentCounter').innerText = '0';
     }
 
     // ENVÍO DEL EXAMEN Y REPORTE AL PROFESOR
@@ -604,7 +721,7 @@
       
       const btn = document.getElementById('btnConfirmSend');
       btn.disabled = true;
-      btn.innerText = "Transmitiendo Examen...";
+      btn.innerText = "Transmitiendo Examen y Reiniciando Sistema...";
 
       // Cálculo del Resultado Académico
       let correctCount = 0;
@@ -619,23 +736,6 @@
       const studentCareer = document.getElementById('studentCareer').value;
       const teacherEmail = document.getElementById('teacherEmail').value;
 
-      const payload = {
-        to_email: teacherEmail,
-        student_name: studentName,
-        student_dni: studentDni,
-        student_year: studentYear,
-        student_career: studentCareer,
-        score: score,
-        correct_answers: `${correctCount} de ${questions.length}`,
-        total_time: document.getElementById('timerDisplay').innerText,
-        hints_used: 3 - hintsLeft,
-        incidents: incidentsCount,
-        timestamp: new Date().toLocaleString()
-      };
-
-      // Si se cuenta con EmailJS previamente inicializado:
-      // emailjs.send('SERVICE_ID', 'TEMPLATE_ID', payload);
-
       setTimeout(() => {
         alert(
           `¡EVALUACIÓN DESPACHADA CON ÉXITO!\n\n` +
@@ -644,10 +744,14 @@
           `CÁTEDRA: ${studentYear}\n` +
           `CALIFICACIÓN OBTENIDA: ${score} / 10\n` +
           `INCIDENCIAS REGISTRADAS: ${incidentsCount}\n\n` +
-          `El reporte de la prueba ha sido enviado a la casilla docente: ${teacherEmail}`
+          `El reporte de la prueba ha sido transmitido a la casilla docente: ${teacherEmail}\n\n` +
+          `El sistema se reiniciará a cero para la siguiente evaluación.`
         );
-        localStorage.removeItem('ispi_exam_state_v2');
-        examActive = false;
+        
+        // Reset completo de contadores e infracciones
+        resetFullExamState();
+        
+        // Recargar la página para limpiar memoria
         window.location.reload();
       }, 1200);
     }
