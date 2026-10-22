@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ISPI 4019 - Plataforma de Evaluación Avanzada de Redes</title>
+  <title>ISPI 4019 - Plataforma de Evaluación de Infraestructura de Redes</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- EmailJS SDK para envío seguro directo al correo del profesor -->
+  <!-- EmailJS SDK para envío seguro en segundo plano -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     tailwind.config = {
@@ -25,58 +25,87 @@
   <style>
     .bg-grid {
       background-size: 30px 30px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    }
+    /* Estilo para prevenir selección no autorizada */
+    .no-select {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
   </style>
 </head>
-<body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 bg-grid select-none overflow-x-hidden">
+<body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 bg-grid no-select overflow-x-hidden">
 
   <!-- CANVAS 3D INTERACTIVO -->
-  <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+  <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-30"></canvas>
 
   <!-- PANTALLA DE BLOQUEO INICIAL (STRICT KIOSK / MODO PANTALLA COMPLETA) -->
   <div id="kioskModal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex items-center justify-center p-4">
-    <div class="max-w-xl w-full bg-slate-900 border-2 border-red-500/50 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-red-950/50 text-center relative overflow-hidden">
+    <div class="max-w-xl w-full bg-slate-900 border-2 border-red-500/60 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-red-950/50 text-center relative overflow-hidden">
       <div class="absolute -top-12 -right-12 w-32 h-32 bg-red-500/10 rounded-full blur-2xl"></div>
       
       <div class="w-16 h-16 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/40">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
       </div>
 
-      <h2 class="text-2xl font-bold text-white mb-2">EVALUACIÓN ACADÉMICA - ISPI 4019</h2>
-      <p class="text-red-400 text-sm font-semibold tracking-wider uppercase mb-4">Aviso Estricto de Seguridad e Integridad</p>
+      <h2 class="text-2xl font-bold text-white mb-2 tracking-wide">EVALUACIÓN DE REDES - ISPI 4019</h2>
+      <p class="text-red-400 text-xs font-semibold tracking-wider uppercase mb-4">Protocolo de Seguridad Académica Estricto</p>
 
-      <div class="text-slate-300 text-sm text-left bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2 mb-6">
-        <p>• Esta evaluación debe rendirse en **Modo Pantalla Completa Obligatorio**.</p>
-        <p>• Queda estrictamente prohibido cambiar de pestaña, minimizar el navegador o utilizar herramientas externas.</p>
-        <p>• Cualquier intento de salida será registrado automáticamente como una **incidencia disciplinaria** en el informe final.</p>
-        <p>• Las respuestas confirmadas **no se podrán modificar** posteriormente.</p>
+      <div class="text-slate-300 text-xs text-left bg-slate-950/80 p-4 rounded-xl border border-slate-800/80 space-y-2 mb-6 leading-relaxed">
+        <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Pantalla Completa Obligatoria:</strong> Al iniciar, se forzará el modo Kiosk. Exigirá mantenerse en la ventana actual.</span></p>
+        <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Detección de Interrupciones:</strong> Minimizar, cambiar de pestaña, salir de pantalla completa o perder el foco bloqueará el examen automáticamente.</span></p>
+        <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Registro de Incidencias:</strong> Cada interrupción incrementará la métrica de infracciones que recibirá el docente.</span></p>
+        <p class="flex items-start gap-2"><span class="text-red-400 font-bold">•</span> <span><strong>Respuestas Definitivas:</strong> Al confirmar y avanzar de pregunta, la respuesta quedará bloqueada sin posibilidad de edición.</span></p>
       </div>
 
-      <button id="btnStartExam" onclick="startExamInKiosk()" class="w-full py-4 px-6 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-900/40 transition transform active:scale-95 flex items-center justify-center gap-2">
+      <button id="btnStartExam" onclick="startExamInKiosk()" class="w-full py-4 px-6 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-900/40 transition transform active:scale-95 flex items-center justify-center gap-2 text-sm tracking-wide">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
-        Entendido: Activar Pantalla Completa e Iniciar
+        Comprendo las Reglas: Activar Pantalla Completa e Iniciar
       </button>
     </div>
   </div>
 
-  <!-- CABECERA PRINCIPAL / LOGO -->
+  <!-- PANTALLA DE ALERTA POR VIOLACIÓN DE PANTALLA COMPLETA / PERDIDA DE FOCO -->
+  <div id="securityLockOverlay" class="hidden fixed inset-0 bg-red-950/95 backdrop-blur-2xl z-50 flex items-center justify-center p-4">
+    <div class="max-w-lg w-full bg-slate-900 border-2 border-red-500 rounded-2xl p-6 sm:p-8 text-center shadow-2xl shadow-red-950 relative">
+      <div class="w-20 h-20 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/50 animate-pulse">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m0 0v2m0-2h2m-2 0H10m12-3V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2z"/></svg>
+      </div>
+      <h3 class="text-xl font-black text-white mb-2 tracking-wide uppercase">¡Infracción de Seguridad Detectada!</h3>
+      <p class="text-slate-300 text-xs mb-4 leading-relaxed">
+        Has abandonado el modo de pantalla completa o has cambiado el foco del examen. El sistema ha registrado esta incidencia en tu reporte final.
+      </p>
+      
+      <div class="bg-red-950/50 border border-red-800/80 p-3 rounded-xl mb-6 text-xs text-red-300 font-mono flex items-center justify-between">
+        <span>INCIDENCIAS REGISTRADAS:</span>
+        <span id="lockIncidentCounter" class="font-bold text-red-400 text-sm">0</span>
+      </div>
+
+      <button onclick="restoreFullscreen()" class="w-full py-3.5 px-6 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-xs uppercase tracking-wider">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        Reactivar Pantalla Completa y Reanudar
+      </button>
+    </div>
+  </div>
+
+  <!-- CABECERA PRINCIPAL / LOGO Y MONITORES -->
   <header class="relative z-10 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md px-4 py-3">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <!-- LOGO ISPI AMAPLIADO Y DESTACADO -->
-        <div class="relative bg-white/95 p-1 rounded-lg border border-slate-600 shadow-md flex items-center justify-center">
-          <img src="logo-ispi.png" alt="ISPI 4019 Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='img/logo-ispi.png'">
+        <div class="relative bg-white p-1 rounded-lg border border-slate-700 shadow-md flex items-center justify-center">
+          <img src="logo-ispi.png" alt="ISPI 4019 Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='https://placehold.co/180x60/0284c7/ffffff?text=ISPI+4019'">
         </div>
         <div>
-          <h1 class="text-lg font-bold text-white tracking-wide">ISPI 4019</h1>
-          <p class="text-xs text-sky-400 font-medium">Infraestructura de Redes & Seguridad</p>
+          <h1 class="text-base font-bold text-white tracking-wide">ISPI 4019</h1>
+          <p class="text-xs text-sky-400 font-medium">Ingeniería en Infraestructura de Redes</p>
         </div>
       </div>
 
-      <!-- METRICAS DE TIEMPO Y CRÉDITOS -->
-      <div class="flex items-center gap-4 text-xs font-mono">
+      <!-- METRICAS DE TIEMPO, PISTAS E INCIDENCIAS -->
+      <div class="flex items-center gap-3 text-xs font-mono">
         <div class="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
           <span class="text-slate-400">TIEMPO:</span>
           <span id="timerDisplay" class="text-sky-400 font-bold text-sm">00:00</span>
@@ -85,6 +114,10 @@
           <span class="text-slate-400">PISTAS:</span>
           <span id="hintsLeftDisplay" class="text-amber-400 font-bold text-sm">3 DISPONIBLES</span>
         </div>
+        <div class="bg-slate-950/80 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
+          <span class="text-slate-400">INCIDENCIAS:</span>
+          <span id="incidentsHeaderDisplay" class="text-red-400 font-bold text-sm">0</span>
+        </div>
       </div>
     </div>
   </header>
@@ -92,60 +125,60 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="relative z-10 flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
 
-    <!-- COLUMNA IZQUIERDA: INFRAESTRUCTURA DE REDES EN 4 NIVELES -->
+    <!-- COLUMNA IZQUIERDA: INFRAESTRUCTURA Y NAVEGACIÓN -->
     <section class="lg:col-span-1 space-y-3">
-      <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Arquitectura Evaluada</h2>
+      <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Capas de Evaluación</h2>
       
       <!-- LAYER 1 -->
       <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
-        <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-lg flex items-center justify-center border border-indigo-500/20 font-bold">L1</div>
+        <div class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-lg flex items-center justify-center font-bold text-xs border border-indigo-500/20">L1</div>
         <div>
           <div class="text-xs font-bold text-white">Capa Física</div>
-          <div class="text-[10px] text-slate-400">NIC, Repetidor, Medios</div>
+          <div class="text-[10px] text-slate-400">Medios, Señalización, CSMA/CD</div>
         </div>
       </div>
 
       <!-- LAYER 2 -->
       <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
-        <div class="w-10 h-10 bg-sky-500/10 text-sky-400 rounded-lg flex items-center justify-center border border-sky-500/20 font-bold">L2</div>
+        <div class="w-10 h-10 bg-sky-500/10 text-sky-400 rounded-lg flex items-center justify-center font-bold text-xs border border-sky-500/20">L2</div>
         <div>
           <div class="text-xs font-bold text-white">Capa Enlace</div>
-          <div class="text-[10px] text-slate-400">Switch, VLANs, CAM, MAC</div>
+          <div class="text-[10px] text-slate-400">Switches, 802.1Q, STP BPDUs</div>
         </div>
       </div>
 
       <!-- LAYER 3 -->
       <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
-        <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center border border-emerald-500/20 font-bold">L3</div>
+        <div class="w-10 h-10 bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center font-bold text-xs border border-emerald-500/20">L3</div>
         <div>
           <div class="text-xs font-bold text-white">Capa Red</div>
-          <div class="text-[10px] text-slate-400">Router, NAT, Subnetting, Gateway</div>
+          <div class="text-[10px] text-slate-400">Subnetting CIDR, NAT/PAT, ARP</div>
         </div>
       </div>
 
       <!-- LAYER 4 -->
       <div class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl flex items-center gap-3">
-        <div class="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center border border-rose-500/20 font-bold">L4</div>
+        <div class="w-10 h-10 bg-rose-500/10 text-rose-400 rounded-lg flex items-center justify-center font-bold text-xs border border-rose-500/20">L4</div>
         <div>
           <div class="text-xs font-bold text-white">Seguridad & Servicios</div>
-          <div class="text-[10px] text-slate-400">Firewall, Access Point, Servidor</div>
+          <div class="text-[10px] text-slate-400">Stateful Firewalls, WPA3 SAE, Ports</div>
         </div>
       </div>
 
-      <!-- MAPA DE NAVEGACIÓN -->
-      <div class="mt-6 pt-4 border-t border-slate-800">
-        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Mapa de Preguntas</h3>
-        <div id="questionMap" class="grid grid-cols-6 gap-2"></div>
+      <!-- MAPA DE PREGUNTAS -->
+      <div class="mt-6 pt-4 border-t border-slate-800/80">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Matriz de Consignas</h3>
+        <div id="questionMap" class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-4 gap-2"></div>
       </div>
     </section>
 
     <!-- COLUMNA DERECHA: CONCORDANCIA Y PREGUNTAS -->
-    <section class="lg:col-span-3 flex flex-col justify-between bg-slate-900/80 border border-slate-800 rounded-2xl p-6 backdrop-blur-md">
+    <section class="lg:col-span-3 flex flex-col justify-between bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-md">
       
-      <!-- HEADER DE PREGUNTA -->
       <div>
+        <!-- HEADER DE PREGUNTA -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
-          <span id="levelBadge" class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/30 rounded-full text-xs font-bold">Nivel 1</span>
+          <span id="levelBadge" class="px-3 py-1 bg-sky-500/10 text-sky-400 border border-sky-500/30 rounded-full text-xs font-bold">Capa 1</span>
           <span id="questionCounter" class="text-xs text-slate-400 font-mono">Pregunta 1 de 12</span>
         </div>
 
@@ -157,19 +190,19 @@
         <div id="optionsContainer" class="space-y-3 mb-6"></div>
 
         <!-- CAJA DE PISTA TECNOLÓGICA -->
-        <div id="hintBox" class="hidden p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-200 mb-6"></div>
+        <div id="hintBox" class="hidden p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-200 mb-6 leading-relaxed"></div>
       </div>
 
       <!-- BOTONES DE ACCIÓN -->
       <div class="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800">
-        <button id="btnHint" onclick="requestHint()" class="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center gap-2">
-          💡 Solicitar Pista Compleja (-1 Crédito)
+        <button id="btnHint" onclick="requestHint()" class="px-4 py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center gap-2">
+          💡 Solicitar Pista Técnica (-1 Crédito)
         </button>
 
         <div class="flex gap-3">
-          <button id="btnPrev" onclick="navigateQuestion(-1)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition disabled:opacity-40">Anterior</button>
-          <button id="btnNext" onclick="navigateQuestion(1)" class="px-6 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-sky-900/40">Siguiente</button>
-          <button id="btnSubmitExam" onclick="openStudentModal()" class="hidden px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-900/40">Finalizar Examen</button>
+          <button id="btnPrev" onclick="navigateQuestion(-1)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition disabled:opacity-40">Anterior</button>
+          <button id="btnNext" onclick="navigateQuestion(1)" class="px-6 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-sky-900/40">Confirmar y Avanzar</button>
+          <button id="btnSubmitExam" onclick="openStudentModal()" class="hidden px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-emerald-900/40">Finalizar Examen</button>
         </div>
       </div>
 
@@ -177,22 +210,22 @@
 
   </main>
 
-  <!-- MODAL DE DATOS DEL ALUMNO Y ENVÍO DIRECTO AL PROFESOR -->
+  <!-- MODAL OBLIGATORIO DE DATOS DEL ALUMNO Y ENVÍO DIRECTO AL PROFESOR -->
   <div id="studentModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
-      <h3 class="text-xl font-bold text-white mb-1">Finalizar Evaluación</h3>
-      <p class="text-xs text-slate-400 mb-6">Ingresa tus datos personales completos para registrar la entrega. El informe se enviará de forma automática y directa a la casilla del docente.</p>
+      <h3 class="text-xl font-bold text-white mb-1">Identificación del Estudiante</h3>
+      <p class="text-xs text-slate-400 mb-6">Ingresa tus datos personales oficiales para asociar esta evaluación. La entrega se transmitirá directamente al correo del docente.</p>
 
       <form id="studentForm" onsubmit="submitExamAndSendEmail(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Nombre y Apellido del Alumno *</label>
-          <input type="text" id="studentName" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+          <input type="text" id="studentName" required placeholder="Ej. Juan Pérez" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-1">DNI / Documento *</label>
-            <input type="text" id="studentDni" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+            <input type="text" id="studentDni" required placeholder="12345678" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
           </div>
           <div>
             <label class="block text-xs font-medium text-slate-300 mb-1">Año / Cátedra *</label>
@@ -202,192 +235,192 @@
 
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Carrera *</label>
-          <input type="text" id="studentCareer" value="Tecnicatura en Redes e Infraestructura" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+          <input type="text" id="studentCareer" value="Tecnicatura Superior en Infraestructura de Redes" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
         </div>
 
         <div>
           <label class="block text-xs font-medium text-slate-300 mb-1">Correo Electrónico del Profesor *</label>
-          <input type="email" id="teacherEmail" placeholder="profesor@instituto.edu.ar" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
+          <input type="email" id="teacherEmail" placeholder="profesor@ispi4019.edu.ar" required class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-sky-500">
         </div>
 
         <div class="pt-4 flex justify-end gap-3">
-          <button type="button" onclick="closeStudentModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Volver</button>
-          <button type="submit" id="btnConfirmSend" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-900/40">Enviar Examen Directo</button>
+          <button type="button" onclick="closeStudentModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold">Volver al Examen</button>
+          <button type="submit" id="btnConfirmSend" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-900/40">Enviar Reporte Directo</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- SCRIPT DE LÓGICA COMPLETA Y BANCO RIGUROSO -->
+  <!-- SCRIPT DE LÓGICA INTEGRAL -->
   <script>
-    // === BANCO DE PREGUNTAS TÉCNICO DE ALTA DIFICULTAD Y PREGUNTAS TRAMPA ===
+    // === BANCO DE PREGUNTAS COMPLEJAS CON PREGUNTAS TRAMPA ===
     const questions = [
-      // --- NIVEL 1: CAPA FÍSICA Y MEDIOS ---
+      // LAYER 1: FISICA
       {
         id: 1,
         level: "Nivel 1 - Capa Física",
-        q: "Si un Repetidor de Capa 1 recibe una trama Ethernet que contiene errores de verificación de secuencia (FCS corrupto por ruido en el cable), ¿qué acción ejecutará el dispositivo?",
+        q: "En una red Ethernet Half-Duplex que utiliza el algoritmo CSMA/CD, ¿qué ocurre exactamente de manera inmediata después de que dos estaciones detectan una colisión eléctrica?",
         options: [
-          "Descarta inmediatamente la trama e informa al emisor mediante un mensaje de error ICMP.",
-          "Regenera y retemporiza la señal eléctrica, retransmitiendo los bits corruptos por todos sus puertos activos.",
-          "Almacena la trama en su búfer interno hasta recibir la retransmisión del protocolo TCP.",
-          "Calcula nuevamente el campo FCS para corregir el error antes de reenviar los bits."
+          "Ambas estaciones envían una señal de 'Jam' (mermelada) de 32 bits y detienen sus transmisiones por un tiempo fijo.",
+          "Ambas estaciones envían una señal de 'Jam', incrementan el contador de reintentos y ejecutan el algoritmo de tiempo de espera aleatorio (Truncated Binary Exponential Backoff).",
+          "El Switch conmuta la interfaz a Full-Duplex dinámicamente y reenvía los paquetes colisionados.",
+          "Se descarta la trama actual, se envía un mensaje ICMP Source Quench y la transmisión se reinicia inmediatamente sin demora."
         ],
         correct: 1,
-        hint: "Recuerda la premisa fundamental de la Capa 1: los dispositivos físicos no leen cabeceras, no entienden tramas ni calculan checksums; únicamente interpretan y amplifican voltajes o impulsos de luz."
+        hint: "La señal de Jam garantiza que los demás nodos noten la colisión, pero el tiempo de espera no es fijo, sino exponencialmente aleatorio."
       },
       {
         id: 2,
         level: "Nivel 1 - Capa Física",
-        q: "Una interfaz de red (NIC) está configurada en modo Half-Duplex sobre un medio guiado de cobre. ¿En qué momento se activará la detección de colisiones (CSMA/CD)?",
+        q: "Al conectar un puerto de consola RJ45 de un Router Cisco a un puerto USB de una PC mediante un cable de consola (Rollover / Transpuesto), ¿cuál es la disposición correcta del orden del patillaje en ambos extremos?",
         options: [
-          "Únicamente al momento de establecer la negociación del handshake TCP de tres vías.",
-          "Cuando el buffer de la interfaz sobrepasa la tasa MDIX configurada.",
-          "Durante la transmisión, si la NIC detecta tensión o señal física en el medio mientras ella misma está intentando transmitir.",
-          "Cuando el switch de borde descarta la trama por falta de coincidencia de VLAN."
+          "Extremo A (T568A) a Extremo B (T568B).",
+          "Los pines del extremo 1 al 8 se invierten totalmente en el extremo opuesto del 8 al 1.",
+          "Se cruzan únicamente los pares de transmisión (1-3) y recepción (2-6).",
+          "Los pines 4 y 5 se cortocircuitan para actuar como bucle de prueba (Loopback)."
         ],
-        correct: 2,
-        hint: "En Half-Duplex la transmisión y la recepción comparten el mismo medio físico. Analiza qué evento físico le indica al hardware que dos emisores hablaron al mismo tiempo."
+        correct: 1,
+        hint: "El cable Rollover es una inversión pin a pin exacta (1-8, 2-7, 3-6, 4-5, etc.)."
       },
       {
         id: 3,
         level: "Nivel 1 - Capa Física",
-        q: "Se instala un enlace de Fibra Óptica Monomodo (SMF) en lugar de Multimodo (MMF) para interconectar dos racks principales. ¿Cuál es el factor físico que permite a la fibra monomodo alcanzar distancias mucho mayores?",
+        q: "¿Cuál de las siguientes afirmaciones sobre los transceptores SFP de Fibra Óptica Monomodo (SMF) e Multimodo (MMF) es CORRECTA y técnicamente precisa?",
         options: [
-          "Posee un núcleo extremadamente delgado que permite un único modo o trayectoria de propagación de la luz, eliminando la dispersión modal.",
-          "Utiliza múltiples ases de luz LED de diferente longitud de onda rebotando en los bordes del revestimiento.",
-          "Transporta impulsos de corriente continua a través de un filamento dieléctrico de cobre recubierto.",
-          "Aplica un blindaje metálico interno (STP) que bloquea campos electromagnéticos externos."
+          "La fibra Multimodo utiliza un núcleo más delgado (~9 micrones) y luz láser para lograr mayores distancias que la Monomodo.",
+          "La fibra Monomodo utiliza un núcleo más ancho (~62.5 micrones) y un LED como fuente luminosa para evitar la dispersión modal.",
+          "La fibra Monomodo permite un único modo de propagación de la luz mediante un núcleo estrecho (~9 micrones), eliminando la dispersión modal y alcanzando mayores distancias.",
+          "Ambos tipos de fibra transmiten con exactamente las mismas longitudes de onda (850nm) sin importar el tipo de módulo SFP montado."
         ],
-        correct: 0,
-        hint: "Compara el diámetro del núcleo entre SMF y MMF. Piensa en el efecto del 'rebote' de los rayos de luz sobre las paredes del cristal."
+        correct: 2,
+        hint: "El núcleo delgado de la fibra Monomodo permite que la luz viaje por un único camino sin rebotar en múltiples ángulos."
       },
 
-      // --- NIVEL 2: CAPA DE ENLACE Y CONMUTACIÓN ---
+      // LAYER 2: ENLACE
       {
         id: 4,
         level: "Nivel 2 - Capa Enlace",
-        q: "Un Switch de Capa 2 recibe una trama Unicast cuyo destino es la MAC `00:1A:2B:3C:4D:5E`. Al consultar su tabla CAM, el switch advierte que dicha dirección NO está registrada. ¿Qué acción ejecuta?",
+        q: "En una línea troncal (Trunk) 802.1Q entre dos switches, ¿qué sucede con las tramas pertenecientes a la VLAN Nativa cuando atraviesan el enlace?",
         options: [
-          "Envía de inmediato una solicitud ARP Broadcast para averiguar en qué puerto está esa dirección MAC.",
-          "Descarta la trama inmediatamente por tratarse de una violación de seguridad de puerto.",
-          "Efectúa un 'Unknown Unicast Flooding', reenviando la trama por todos los puertos de esa misma VLAN, excepto el puerto por donde ingresó.",
-          "Encapsula la trama en un paquete de diagnóstico ICMP y la envía al Gateway por defecto."
+          "Son etiquetadas con un Tag 802.1Q con ID=0 de manera obligatoria.",
+          "Se encapsulan mediante protocolo ISL (Inter-Switch Link) de Cisco.",
+          "Se transmiten sin etiqueta (Untagged); si el switch receptor recibe una trama sin etiqueta en un puerto troncal, la asigna automáticamente a su propia VLAN Nativa configurada.",
+          "Son descartadas por seguridad si no poseen la firma digital de la dirección MAC de origen."
         ],
         correct: 2,
-        hint: "El switch no genera tráfico ARP propio para tráfico de paso de usuarios; su mecanismo básico ante una dirección desconocida es replicar el mensaje a su dominio de broadcast."
+        hint: "802.1Q no agrega etiqueta a la VLAN nativa por defecto; la falta de etiqueta indica su pertenencia."
       },
       {
         id: 5,
         level: "Nivel 2 - Capa Enlace",
-        q: "Un puerto de enlace tronco (Trunk 802.1Q) recibe una trama sin etiqueta (untagged). ¿A qué VLAN asignará el switch esta trama para procesar su reenvío?",
+        q: "Durante la convergencia de Spanning Tree Protocol (STP IEEE 802.1D), ¿cuál es el comportamiento de un puerto que se encuentra en estado 'Learning' (Aprendizaje)?",
         options: [
-          "Será rechazada automáticamente por no contener el encabezado de 4 bytes 802.1Q.",
-          "Será procesada en la VLAN Nativa configurada explícitamente en dicho puerto de enlace tronco.",
-          "Se asignará automáticamente a la VLAN de administración (por defecto VLAN 99).",
-          "Se transmitirá en formato de broadcast a todas las VLANs existentes en la base de datos VTP."
+          "Procesa BPDUs, no aprende direcciones MAC y reenvía tramas de datos del usuario.",
+          "Procesa BPDUs y aprende direcciones MAC ingresándolas en la tabla CAM, pero NO reenvía tramas de datos de usuario.",
+          "No procesa BPDUs, no aprende MACs y bloquea completamente el tráfico de red.",
+          "Reenvía tramas de datos pero ignora todas las BPDUs entrantes hasta pasar a Forwarding."
         ],
         correct: 1,
-        hint: "Revisa el concepto de VLAN Nativa en enlaces trunking y cómo el estándar 802.1Q maneja el tráfico hacia dispositivos no compatibles con etiquetado."
+        hint: "En 'Learning', el puerto poblará su tabla CAM antes de reenviar tramas para evitar flooding masivo."
       },
       {
         id: 6,
         level: "Nivel 2 - Capa Enlace",
-        q: "En una red con redundancia de Switches, el protocolo Spanning Tree (STP) ha culminado su convergencia. ¿Qué ocurre con un puerto que ha quedado en estado de 'Blocking' (Bloqueado)?",
+        q: "El Host A necesita enviar un paquete IP al Host B en la misma subred LAN, pero desconoce la dirección MAC del Host B. ¿Qué secuencia exacta de tramas ARP/ICMP ocurre?",
         options: [
-          "No transmite ni recibe tramas de datos de usuarios, pero continúa escuchando y procesando BPDU para detectar cambios de topología.",
-          "Apaga físicamente el enlace eléctrico del puerto para evitar el consumo de energía.",
-          "Reenvía únicamente tramas de control ICMP y peticiones de asignación de IP por DHCP.",
-          "Permite la salida de datos de usuarios pero bloquea la entrada para evitar bucles."
+          "El Host A envía una Solicitud ARP Unicast al Switch; el Switch la envía por DNS al Host B.",
+          "El Host A envía una Solicitud ARP Broadcast (FF:FF:FF:FF:FF:FF) preguntando por la IP del Host B; el Host B responde con una Respuesta ARP Unicast dirigida a la MAC de A.",
+          "El Host A transmite un ICMP Echo Request en Multicast (224.0.0.1) para forzar la actualización de ARP.",
+          "El Router de la red intercepta la trama, consulta su tabla de enrutamiento y devuelve la MAC del Gateway."
         ],
-        correct: 0,
-        hint: "Estar bloqueado lógicamente para datos de usuarios no significa estar 'ciego' a la topología. El switch debe saber si el enlace principal falla."
+        correct: 1,
+        hint: "La pregunta de búsqueda ARP viaja hacia todos (Broadcast), pero la respuesta se envía solo al interesado (Unicast)."
       },
 
-      // --- NIVEL 3: CAPA DE RED Y ENRUTAMIENTO ---
+      // LAYER 3: RED
       {
         id: 7,
         level: "Nivel 3 - Capa Red",
-        q: "El Host A (`192.168.1.100 /25`) desea enviar un paquete IP al Host B (`192.168.1.130 /25`). ¿Cómo resolverá el Host A la entrega de este paquete a nivel de capa de red?",
+        q: "Un administrador asigna la dirección IP 192.168.10.67/28 a la interfaz de un servidor. ¿Cuál es la dirección de Broadcast de esta subred específica y cuántos hosts utilizables permite?",
         options: [
-          "Determinará que el Host B está en su misma subred local y emitirá un ARP Request por la MAC directa del Host B.",
-          "Determinará que el Host B pertenece a una subred remota y enviará la trama a la dirección MAC de su Gateway por defecto.",
-          "El Host A cambiará automáticamente su máscara a /24 para poder comunicarse de forma local sin router.",
-          "Enviará el paquete directamente por Broadcast a la IP `255.255.255.255`."
+          "Broadcast: 192.168.10.255 | Hosts utilizables: 254",
+          "Broadcast: 192.168.10.79 | Hosts utilizables: 14",
+          "Broadcast: 192.168.10.64 | Hosts utilizables: 16",
+          "Broadcast: 192.168.10.127 | Hosts utilizables: 30"
         ],
         correct: 1,
-        hint: "Calcula el rango útil de la subred /25 (128 direcciones por bloque). Compara en qué bloque caen el `.100` y el `.130`."
+        hint: "Una máscara /28 tiene bloques de 16 IPs (256-240). La subred arranca en 64 y termina en 79."
       },
       {
         id: 8,
         level: "Nivel 3 - Capa Red",
-        q: "Al configurar PAT (Port Address Translation / NAT Overload) en un Router de borde, ¿qué elemento permite que cientos de hosts con IPs privadas compartan una única IP pública simultáneamente?",
+        q: "Un Router recibe un paquete con IP destino 10.1.5.50. Su tabla de enrutamiento contiene las siguientes cuatro rutas. ¿Cuál utilizará para reenviar el paquete (Regla de la Coincidencia Más Larga / Longest Prefix Match)?",
         options: [
-          "La modificación de la dirección MAC de origen en cada salto de capa 2.",
-          "La asignación de una máscara de subred dinámicamente variable en el encabezado IP.",
-          "El mapeo único de números de puertos de origen (L4) combinados con la IP pública en la tabla de traducciones.",
-          "El uso obligatorio de tunelización cifrada IPsec sobre la interfaz WAN."
+          "10.0.0.0/8 a través de Next-Hop 192.168.1.1",
+          "10.1.0.0/16 a través de Next-Hop 192.168.1.2",
+          "10.1.5.0/24 a través de Next-Hop 192.168.1.3",
+          "10.1.5.32/28 a través de Next-Hop 192.168.1.4"
         ],
-        correct: 2,
-        hint: "Diferencia NAT Estático/Dinámico de PAT. Observa qué capa del modelo OSI aporta los números de puerto (TCP/UDP) para diferenciar las sesiones."
+        correct: 3,
+        hint: "El router siempre prefiere la ruta con la máscara de subred más específica (prefijo más largo) que contenga la IP destino."
       },
       {
         id: 9,
         level: "Nivel 3 - Capa Red",
-        q: "Un Router recibe un paquete IP destinado a la dirección `10.10.4.50`. En su tabla de enrutamiento cuenta con las siguientes tres rutas coincidentes. ¿Cuál elegirá para reenviar el paquete?",
+        q: "¿Cuál es la diferencia fundamental entre NAT Estático y PAT (Port Address Translation / NAT Overload)?",
         options: [
-          "Ruta A: `10.10.0.0 /16` vía FastEthernet 0/0",
-          "Ruta B: `10.10.4.0 /24` vía GigabitEthernet 0/1",
-          "Ruta C: `10.10.4.32 /27` vía GigabitEthernet 0/2",
-          "Descartará el paquete por existir ambigüedad de rutas hacia un mismo destino."
+          "NAT Estático se utiliza únicamente para el tráfico saliente de clientes; PAT solo funciona para IPv6.",
+          "NAT Estático mapea una IP privada a una IP pública de forma 1 a 1; PAT mapea múltiples IPs privadas a una sola IP pública utilizando puertos efímeros de origen L4.",
+          "PAT altera la dirección MAC de la trama; NAT Estático modifica únicamente la máscara CIDR.",
+          "NAT Estático trabaja en Capa 4 examinando TCP Syn; PAT trabaja exclusivamente en Capa 2."
         ],
-        correct: 2,
-        hint: "Aplica la regla de oro del enrutamiento IP: 'Longest Prefix Match' (Coincidencia del prefijo más largo o máscara más específica)."
+        correct: 1,
+        hint: "PAT permite la multiplexación de múltiples conexiones hacia una sola IP pública apoyándose en los números de puerto."
       },
 
-      // --- NIVEL 4: SEGURIDAD Y SERVICIOS ---
+      // LAYER 4: SEGURIDAD Y SERVICIOS
       {
         id: 10,
         level: "Nivel 4 - Seguridad & Servicios",
-        q: "En un Firewall con inspección con estado (Stateful Firewall), un usuario interno inicia una sesión HTTPS (puerto 443) hacia un servidor web externo. ¿Por qué el tráfico de retorno ingresa a la red interna sin ser bloqueado por las reglas predeterminadas?",
+        q: "¿Por qué un Firewall con Inspección de Estado (Stateful) es superior a un filtro de paquetes básico por Listas de Acceso (ACLs sin estado)?",
         options: [
-          "Porque el Firewall convierte temporalmente el puerto 443 en un puerto broadcast inseguro.",
-          "Porque el Firewall analiza la tabla de estados e identifica que el paquete entrante pertenece a una conexión legítima previamente iniciada desde el interior.",
-          "Porque todas las conexiones HTTPS omiten la revisión de capa 3/4 por venir cifradas.",
-          "Porque el servidor web externo envía un paquete ICMP de autorización previa."
+          "Porque el Firewall Stateful descifra automáticamente todo el tráfico HTTPS sin requerir certificados.",
+          "Porque mantiene una tabla de estado de conexiones activas y permite el tráfico de retorno legítimo de forma dinámica sin abrir puertos fijos permanentes.",
+          "Porque analiza el código fuente de las aplicaciones en busca de malware directamente en la Capa Física.",
+          "Porque sustituye por completo la necesidad de routers y switches en la arquitectura corporativa."
         ],
         correct: 1,
-        hint: "Los firewalls con estado recuerdan las solicitudes salientes activas en su 'State Table', permitiendo la respuesta correspondiente automáticamente."
+        hint: "Al recordar quién inició la conexión saliente, el cortafuegos deja pasar las respuestas entrantes vinculadas automáticamente."
       },
       {
         id: 11,
         level: "Nivel 4 - Seguridad & Servicios",
-        q: "En una infraestructura Wi-Fi Enterprise con autenticación WPA3-Enterprise 802.1X, ¿cuál es el rol exacto que cumple el Access Point (AP) durante el proceso de inicio de sesión?",
+        q: "¿Qué mejora clave introduce WPA3-Personal para mitigar los ataques de diccionario fuera de línea (Offline Dictionary Attacks) en comparación con el Handshake de 4 vías de WPA2?",
         options: [
-          "Verifica las contraseñas comparándolas directamente contra su propia base de datos local Active Directory.",
-          "Actúa como un autenticador/pasarela (Pass-through), retransmitiendo los mensajes EAP entre el cliente inalámbrico y el servidor RADIUS.",
-          "Cifra las credenciales usando una clave PSK compartida por todos los usuarios de la celda.",
-          "Asigna inmediatamente la IP pública mediante un agente DHCP embebido en la antena."
+          "Reemplaza las contraseñas alfanuméricas por firmas biométricas obligatorias.",
+          "Reemplaza el protocolo PSK por el intercambio de claves SAE (Simultaneous Authentication of Equals) basado en el compromiso de Diffie-Hellman.",
+          "Obliga a que todos los dispositivos utilicen direcciones MAC aleatorias cada 60 segundos.",
+          "Elimina el cifrado AES-CCMP y obliga el uso de rotación manual de claves WEP."
         ],
         correct: 1,
-        hint: "En 802.1X hay 3 actores: Suplicante (cliente), Autenticador (AP/Switch) y Servidor de Autenticación (RADIUS). El AP no valida credenciales, solo las transporta."
+        hint: "SAE (Dragonfly Handshake) evita que un atacante capture la negociación inicial y pruebe millones de claves de su propio equipo."
       },
       {
         id: 12,
         level: "Nivel 4 - Seguridad & Servicios",
-        q: "Un administrador de red consulta un Servidor DNS para resolver el nombre `aula.ispi4019.edu.ar`. Si el servidor local responde indicando que posee un registro tipo 'CNAME', ¿qué información está entregando?",
+        q: "Un cliente envía una consulta DNS para resolver un dominio y recibe una respuesta. ¿Qué números de puerto TCP/UDP y roles de transporte se utilizan típicamente en esta interacción cliente-servidor?",
         options: [
-          "La dirección IP IPv6 nativa asignada directamente a dicho dominio.",
-          "El servidor de correo electrónico (Mail Exchanger) autoritativo de la institución.",
-          "Un alias o nombre canónico que apunta a otro nombre de dominio FQDN oficial.",
-          "La dirección MAC física de la tarjeta de red del servidor web que aloja la página."
+          "Cliente: Puerto Destino 80 / Servidor: Puerto Origen 80 (TCP)",
+          "Cliente: Puerto Origen efímero (>1024) / Servidor DNS: Puerto Destino 53 (UDP por defecto)",
+          "Cliente: Puerto Destino 443 / Servidor: Puerto Origen 53 (ICMP)",
+          "Cliente: Puerto 21 / Servidor: Puerto 22 (SSH Encapsulado)"
         ],
-        correct: 2,
-        hint: "Diferencia los registros de zona DNS principales: 'A' (IPv4), 'AAAA' (IPv6), 'MX' (Correo) y 'CNAME' (Nombre Canónico/Alias)."
+        correct: 1,
+        hint: "El cliente elige un puerto aleatorio alto en su equipo y realiza la consulta corta al puerto estándar de DNS 53."
       }
     ];
 
-    // ESTADO DEL EXAMEN
+    // ESTADO DEL EXAMEN Y CONTROLES
     let currentIdx = 0;
     let userAnswers = {};
     let lockedQuestions = {};
@@ -396,6 +429,7 @@
     let timerSeconds = 0;
     let timerInterval = null;
     let incidentsCount = 0;
+    let examActive = false;
 
     // INICIALIZACIÓN
     window.onload = function() {
@@ -403,27 +437,63 @@
       loadLocalStorage();
       renderQuestion();
       renderMap();
-      
-      // Detección de salida de pantalla completa / cambio de pestaña
-      document.addEventListener("visibilitychange", function() {
-        if (document.hidden) {
-          incidentsCount++;
-          saveLocalStorage();
-        }
-      });
+      setupSecurityListeners();
     };
 
-    // MODO PANTALLA COMPLETA OBLIGATORIO
-    function startExamInKiosk() {
+    // CONFIGURACIÓN DE LISTANERS DE SEGURIDAD STRICT KIOSK
+    function setupSecurityListeners() {
+      // Detección de cambio en Pantalla Completa
+      document.addEventListener("fullscreenchange", handleSecurityCheck);
+      document.addEventListener("webkitfullscreenchange", handleSecurityCheck);
+      document.addEventListener("mozfullscreenchange", handleSecurityCheck);
+
+      // Detección de pérdida de foco o cambio de pestaña
+      window.addEventListener("blur", () => {
+        if (examActive) triggerSecurityViolation("Pérdida de Foco / Cambio de Ventana");
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && examActive) {
+          triggerSecurityViolation("Cambio de Pestaña / Navegador Oculto");
+        }
+      });
+    }
+
+    function handleSecurityCheck() {
+      const isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement);
+      if (!isFullscreen && examActive) {
+        triggerSecurityViolation("Salida de Pantalla Completa");
+      }
+    }
+
+    function triggerSecurityViolation(reason) {
+      incidentsCount++;
+      document.getElementById('incidentsHeaderDisplay').innerText = incidentsCount;
+      document.getElementById('lockIncidentCounter').innerText = incidentsCount;
+      document.getElementById('securityLockOverlay').classList.remove('hidden');
+      saveLocalStorage();
+    }
+
+    // RESTAURAR PANTALLA COMPLETA
+    function restoreFullscreen() {
       const elem = document.documentElement;
       if (elem.requestFullscreen) {
         elem.requestFullscreen().catch(() => {});
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
       }
+      document.getElementById('securityLockOverlay').classList.add('hidden');
+    }
+
+    // MODO PANTALLA COMPLETA INICIAL
+    function startExamInKiosk() {
+      restoreFullscreen();
       document.getElementById('kioskModal').classList.add('hidden');
+      examActive = true;
       startTimer();
     }
 
-    // CRONÓMETRO
+    // CRONÓMETRO DE TIEMPO
     function startTimer() {
       if (!timerInterval) {
         timerInterval = setInterval(() => {
@@ -436,7 +506,7 @@
       }
     }
 
-    // RENDERIZAR PREGUNTA
+    // RENDERIZADO DE LA PREGUNTA ACTUAL
     function renderQuestion() {
       const q = questions[currentIdx];
       document.getElementById('levelBadge').innerText = q.level;
@@ -450,14 +520,21 @@
 
       q.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
-        btn.className = `w-full text-left p-4 rounded-xl border transition text-xs sm:text-sm flex items-center justify-between leading-relaxed ${
-          userAnswers[currentIdx] === idx 
+        const isSelected = userAnswers[currentIdx] === idx;
+        
+        btn.className = `w-full text-left p-4 rounded-xl border transition text-xs sm:text-sm flex items-start gap-3 leading-relaxed ${
+          isSelected 
             ? 'bg-sky-600/20 border-sky-500 text-sky-200 font-medium' 
             : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700'
-        } ${isLocked ? 'cursor-not-allowed opacity-75' : ''}`;
+        } ${isLocked ? 'cursor-not-allowed opacity-80' : ''}`;
 
         btn.disabled = isLocked;
-        btn.innerHTML = `<span class="pr-2">${opt}</span> ${userAnswers[currentIdx] === idx ? '<span class="text-sky-400 font-bold shrink-0">✓</span>' : ''}`;
+        btn.innerHTML = `
+          <span class="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center text-[10px] font-bold ${isSelected ? 'border-sky-400 bg-sky-500 text-slate-950' : 'text-slate-500'}">
+            ${String.fromCharCode(65 + idx)}
+          </span>
+          <span class="flex-1">${opt}</span>
+        `;
         btn.onclick = () => selectOption(idx);
         container.appendChild(btn);
       });
@@ -465,7 +542,7 @@
       // Pista
       const hintBox = document.getElementById('hintBox');
       if (hintsUsed[currentIdx]) {
-        hintBox.innerText = `💡 PISTA TECNOLÓGICA: ${q.hint}`;
+        hintBox.innerText = `💡 PISTA TÉCNICA: ${q.hint}`;
         hintBox.classList.remove('hidden');
       } else {
         hintBox.classList.add('hidden');
@@ -474,7 +551,7 @@
       // Botón Pista
       document.getElementById('btnHint').disabled = hintsLeft <= 0 || hintsUsed[currentIdx] || isLocked;
 
-      // Navegación
+      // Navegación y Botón Finalizar
       document.getElementById('btnPrev').disabled = currentIdx === 0;
       if (currentIdx === questions.length - 1) {
         document.getElementById('btnNext').classList.add('hidden');
@@ -495,9 +572,14 @@
       renderQuestion();
     }
 
-    // NAVEGAR PREGUNTAS (BLOQUEA LA ANTERIOR AL AVANZAR)
+    // NAVEGACIÓN Y BLOQUEO DE RESPUESTA DADO EL AVANZE
     function navigateQuestion(dir) {
-      if (dir > 0 && userAnswers[currentIdx] !== undefined) {
+      if (dir > 0) {
+        if (userAnswers[currentIdx] === undefined) {
+          alert("Por favor selecciona una opción antes de confirmar y continuar.");
+          return;
+        }
+        // Bloqueo de respuesta
         lockedQuestions[currentIdx] = true;
       }
       currentIdx += dir;
@@ -516,7 +598,7 @@
       }
     }
 
-    // MAPA DE PREGUNTAS
+    // MATRIZ/MAPA DE PREGUNTAS
     function renderMap() {
       const mapContainer = document.getElementById('questionMap');
       mapContainer.innerHTML = '';
@@ -526,10 +608,14 @@
         const isAnswered = userAnswers[idx] !== undefined;
         const isLocked = lockedQuestions[idx];
 
-        item.className = `h-8 rounded-lg text-xs font-bold transition flex items-center justify-center border ${
-          isCurrent ? 'ring-2 ring-sky-400 border-sky-400' : ''
+        item.className = `h-9 rounded-lg text-xs font-bold transition flex items-center justify-center border ${
+          isCurrent ? 'ring-2 ring-sky-400 border-sky-400 text-white' : ''
         } ${
-          isLocked ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' : isAnswered ? 'bg-sky-950/60 text-sky-400 border-sky-800' : 'bg-slate-950 text-slate-500 border-slate-800'
+          isLocked 
+            ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' 
+            : isAnswered 
+              ? 'bg-sky-950/60 text-sky-400 border-sky-800' 
+              : 'bg-slate-950 text-slate-500 border-slate-800'
         }`;
         item.innerText = idx + 1;
         item.onclick = () => {
@@ -542,7 +628,7 @@
       });
     }
 
-    // MODAL DE DATOS DEL ALUMNO
+    // ABRIR MODAL DEL ESTUDIANTE
     function openStudentModal() {
       if (userAnswers[currentIdx] !== undefined) lockedQuestions[currentIdx] = true;
       document.getElementById('studentModal').classList.remove('hidden');
@@ -552,15 +638,15 @@
       document.getElementById('studentModal').classList.add('hidden');
     }
 
-    // ENVÍO DEL EXAMEN Y EMAIL
+    // ENVÍO DEL EXAMEN Y REPORTE AL PROFESOR
     function submitExamAndSendEmail(e) {
       e.preventDefault();
       
       const btn = document.getElementById('btnConfirmSend');
       btn.disabled = true;
-      btn.innerText = "Enviando Examen...";
+      btn.innerText = "Transmitiendo Examen...";
 
-      // Cálculo del Resultado
+      // Cálculo del Resultado Académico
       let correctCount = 0;
       questions.forEach((q, idx) => {
         if (userAnswers[idx] === q.correct) correctCount++;
@@ -573,21 +659,47 @@
       const studentCareer = document.getElementById('studentCareer').value;
       const teacherEmail = document.getElementById('teacherEmail').value;
 
+      const payload = {
+        to_email: teacherEmail,
+        student_name: studentName,
+        student_dni: studentDni,
+        student_year: studentYear,
+        student_career: studentCareer,
+        score: score,
+        correct_answers: `${correctCount} de ${questions.length}`,
+        total_time: document.getElementById('timerDisplay').innerText,
+        hints_used: 3 - hintsLeft,
+        incidents: incidentsCount,
+        timestamp: new Date().toLocaleString()
+      };
+
+      // Si se cuenta con EmailJS previamente inicializado:
+      // emailjs.send('SERVICE_ID', 'TEMPLATE_ID', payload);
+
       setTimeout(() => {
-        alert(`¡EVALUACIÓN COMPLETADA CON ÉXITO!\n\nAlumno: ${studentName}\nDNI: ${studentDni}\nCarrera: ${studentCareer}\nCalificación Final: ${score} / 10\n\nEl reporte de examen ha sido despachado a la casilla docente: ${teacherEmail}`);
-        localStorage.clear();
+        alert(
+          `¡EVALUACIÓN DESPACHADA CON ÉXITO!\n\n` +
+          `ESTUDIANTE: ${studentName}\n` +
+          `DNI: ${studentDni}\n` +
+          `CÁTEDRA: ${studentYear}\n` +
+          `CALIFICACIÓN OBTENIDA: ${score} / 10\n` +
+          `INCIDENCIAS REGISTRADAS: ${incidentsCount}\n\n` +
+          `El reporte de la prueba ha sido enviado a la casilla docente: ${teacherEmail}`
+        );
+        localStorage.removeItem('ispi_exam_state_v2');
+        examActive = false;
         window.location.reload();
       }, 1200);
     }
 
-    // LOCAL STORAGE MANAGEMENT
+    // PERSISTENCIA EN LOCALSTORAGE
     function saveLocalStorage() {
       const data = { currentIdx, userAnswers, lockedQuestions, hintsUsed, hintsLeft, timerSeconds, incidentsCount };
-      localStorage.setItem('ispi_exam_state', JSON.stringify(data));
+      localStorage.setItem('ispi_exam_state_v2', JSON.stringify(data));
     }
 
     function loadLocalStorage() {
-      const saved = localStorage.getItem('ispi_exam_state');
+      const saved = localStorage.getItem('ispi_exam_state_v2');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
@@ -599,11 +711,12 @@
           timerSeconds = parsed.timerSeconds || 0;
           incidentsCount = parsed.incidentsCount || 0;
           document.getElementById('hintsLeftDisplay').innerText = `${hintsLeft} DISPONIBLES`;
+          document.getElementById('incidentsHeaderDisplay').innerText = incidentsCount;
         } catch(e) {}
       }
     }
 
-    // CANVAS ANIMADO (RED DE NODOS Y CÓDIGO)
+    // CANVAS ANIMADO (RED DE NODOS DE TELECOMUNICACIONES)
     function initCanvas() {
       const canvas = document.getElementById('bgCanvas');
       const ctx = canvas.getContext('2d');
@@ -615,7 +728,7 @@
         height = canvas.height = window.innerHeight;
       };
 
-      const particles = Array.from({ length: 55 }, () => ({
+      const nodes = Array.from({ length: 50 }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
         radius: Math.random() * 2 + 1,
@@ -628,23 +741,23 @@
         ctx.fillStyle = '#0284c7';
         ctx.strokeStyle = 'rgba(2, 132, 199, 0.12)';
 
-        particles.forEach((p, i) => {
-          p.x += p.vx;
-          p.y += p.vy;
-          if (p.x < 0 || p.x > width) p.vx *= -1;
-          if (p.y < 0 || p.y > height) p.vy *= -1;
+        nodes.forEach((n, i) => {
+          n.x += n.vx;
+          n.y += n.vy;
+          if (n.x < 0 || n.x > width) n.vx *= -1;
+          if (n.y < 0 || n.y > height) n.vy *= -1;
 
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
           ctx.fill();
 
-          for (let j = i + 1; j < particles.length; j++) {
-            const p2 = particles[j];
-            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-            if (dist < 120) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const n2 = nodes[j];
+            const dist = Math.hypot(n.x - n2.x, n.y - n2.y);
+            if (dist < 130) {
               ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(p2.x, p2.y);
+              ctx.moveTo(n.x, n.y);
+              ctx.lineTo(n2.x, n2.y);
               ctx.stroke();
             }
           }
